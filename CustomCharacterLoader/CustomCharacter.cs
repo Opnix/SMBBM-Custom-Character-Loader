@@ -18,7 +18,7 @@ public class CustomCharacter : UnityEngine.Object
     // Unity Asset Bundle Stuff
     public AssetBundle asset;
     public Sprite icon;
-    public Sprite picture;
+    public Sprite banner;
     public Sprite pause;
 
     private class CharacterTemp

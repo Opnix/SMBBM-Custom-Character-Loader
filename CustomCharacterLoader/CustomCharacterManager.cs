@@ -66,11 +66,12 @@ namespace CustomCharacterLoader
                 {
                     chara.icon = chara.asset.LoadAsset<Sprite>("icon");
                 }
-                if (!chara.picture)
+                if (!chara.banner)
                 {
-                    chara.picture = chara.asset.LoadAsset<Sprite>("picture");
+                    chara.banner = chara.asset.LoadAsset<Sprite>("banner");
+                    Console.WriteLine("finding banner");
                 }
-                chara.itemData.costumeList[0].spritePicture = chara.picture;
+                chara.itemData.costumeList[0].spritePicture = chara.banner;
                 chara.itemData.costumeList[0].spriteIcon = chara.icon;
 
                 // update image thumbnail
@@ -82,7 +83,7 @@ namespace CustomCharacterLoader
                         selectedCharacterID = characterSelectDisplay.GetThumbnail().GetInstanceID();
                     }
                     // Update Name Banner
-                    if (characterSelectDisplay.GetThumbnail().GetInstanceID() == chara.picture.GetInstanceID())
+                    if (characterSelectDisplay.GetThumbnail().GetInstanceID() == chara.banner.GetInstanceID())
                     {
                         characterSelectDisplay.SetCharacterName(chara.charaName);
                     }
@@ -96,7 +97,7 @@ namespace CustomCharacterLoader
             checkSelectedCharacter = false;
             foreach (CustomCharacter chara in characters)
             {
-                if (selectedCharacterID == chara.picture.GetInstanceID())
+                if (selectedCharacterID == chara.banner.GetInstanceID())
                 {
                     selectedCharacter = chara;
                     loadCharacter = true;

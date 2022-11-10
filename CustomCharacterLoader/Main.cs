@@ -37,6 +37,8 @@ namespace CustomCharacterLoader
             var obj = new GameObject { hideFlags = HideFlags.HideAndDontSave };
             Object.DontDestroyOnLoad(obj);
             customCharacterManager = new CustomCharacterManager(obj.AddComponent(Il2CppType.Of<CustomCharacterManager>()).Pointer, PATH);
+
+            //CharacterSelectPatch.CreateDetour();
         }
 
         // Mod Late Update (Split by scene names)
