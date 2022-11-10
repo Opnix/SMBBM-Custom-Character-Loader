@@ -9,7 +9,7 @@ public class CustomCharacter : UnityEngine.Object
 {
     // From Json
     public string charaName = "";
-    private string assetBundle = "";
+    private string asset_name = "";
     private string voiceBank = "";
 
     // Super Monkey Ball Objects
@@ -24,12 +24,11 @@ public class CustomCharacter : UnityEngine.Object
     private class CharacterTemp
     {
         public string chara_name { get; set; }
-        public string asset_bundle { get; set; }
         public string voice_bank { get; set; }
     }
 
     // reads a json file then get the asset bundle and base_character
-    public CustomCharacter(string json, string CHARA_PATH)
+    public CustomCharacter(string asset_name, string json, string CHARA_PATH)
     {
         CharacterTemp template = JsonSerializer.Deserialize<CharacterTemp>(json);
         if (template.voice_bank == "")
@@ -42,15 +41,19 @@ public class CustomCharacter : UnityEngine.Object
         }
 
         this.charaName = template.chara_name;
-        this.assetBundle = template.asset_bundle;
+        this.asset_name = asset_name;
 
-        Console.WriteLine("Loading Asset Bundle: " + this.assetBundle);
+        Console.WriteLine("Loading Asset Bundle: " + this.asset_name);
 
         // get asset bundle
-        this.asset = AssetBundle.LoadFromFile(Path.Combine(CHARA_PATH, this.assetBundle));
+        this.asset = AssetBundle.LoadFromFile(Path.Combine(CHARA_PATH, this.asset_name));
         if (this.asset == null)
         {
-            Console.WriteLine("Cant find Asset bundle for " + CHARA_PATH + this.assetBundle);
+            Console.WriteLine("Cant find Asset bundle for " + CHARA_PATH + this.asset_name);
+        }
+        else
+        {
+            Console.WriteLine("Loaded Asset Bundle: " + this.asset_name);
         }
     }
 
