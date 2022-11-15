@@ -8,20 +8,11 @@ using UnhollowerRuntimeLib;
 
 namespace CustomCharacterLoader
 {
-
     public static class Main
     {
-        // Character Path
         public static string PATH = "";
-
-        // Scene Name
         private static string sceneName;
-
-        // Custom Character Stuff
         private static CustomCharacterManager customCharacterManager = null;
-
-        // Visual Game Objects (name banner, thumbnails, etc) 
-        private static SelMainThemeBeltView displayView = null;
                 
         // Mod Load
         public static void OnModLoad(Dictionary<string, object> settings)
@@ -32,13 +23,16 @@ namespace CustomCharacterLoader
         public static void OnModStart()
         {
             PATH = System.Reflection.Assembly.GetCallingAssembly().Location.Split(new string[] { "BananaModManager.Loader.IL2Cpp.dll" }, System.StringSplitOptions.None)[0] + "mods\\CustomCharacterLoader\\Characters";
-            
+
+            // create custom character manager
             ClassInjector.RegisterTypeInIl2Cpp(typeof(CustomCharacterManager));
             var obj = new GameObject { hideFlags = HideFlags.HideAndDontSave };
             Object.DontDestroyOnLoad(obj);
             customCharacterManager = new CustomCharacterManager(obj.AddComponent(Il2CppType.Of<CustomCharacterManager>()).Pointer, PATH);
-
-            //CharacterSelectPatch.CreateDetour();
+            
+            // Patches
+            Patches.MgCharaOnSubmitPatch.CreateDetour();
+            Patches.TaCharaOnSubmitPatch.CreateDetour();
         }
 
         // Mod Late Update (Split by scene names)
@@ -52,12 +46,8 @@ namespace CustomCharacterLoader
                 customCharacterManager.LoadCustomCharacter();
             }
 
-            // Scene = Title
-            if (sceneName == "Title")
-            {
-            }
             // Scene = MainMenu
-            else if (sceneName == "MainMenu")
+            if (sceneName == "MainMenu")
             {
                 // Import characters
                 if (!customCharacterManager.importedCharacters)
@@ -67,38 +57,38 @@ namespace CustomCharacterLoader
                     if (charaDataListContainer != null && charaDataListContainer.Length > 0)
                     {
                         customCharacterManager.ImportCharacters(charaDataListContainer[0]);
+
+                        // patch for name banner now that all the characters are loaded
+                        Patches.MgCharaNamePatch.CreateDetour();
+                        Patches.TaCharaNamePatch.CreateDetour();
+
+                        customCharacterManager.update(); // make sure pictures stay
                     }
                 }
                 // After Characters are imported
                 else
                 {
-                    // Get belt view if null
-                    if (displayView == null)
-                    {
-                        SelMainThemeBeltView[] views = Object.FindObjectsOfType<SelMainThemeBeltView>();
-                        foreach (SelMainThemeBeltView i in views)
-                        {
-                            if (i.GetThumbnail() != null)
-                            {
-                                displayView = i;
-                                break;
-                            }
-                        }
-                    }
-                    // Update images
-                    else
-                    {
-                        customCharacterManager.update(displayView);
-                    }
+                    customCharacterManager.update(); // really make sure pictures stay
                 }
             }
             // Scene = MainGame
             else if (sceneName == "MainGame")
             {
                 // Check if custom character is selected
-                if (customCharacterManager.checkSelectedCharacter)
+                if (Patches.MgCharaOnSubmitPatch.checkSelectedCharacter || Patches.TaCharaOnSubmitPatch.checkSelectedCharacter)
                 {
                     customCharacterManager.IsCustomCharacterSelected();
+                }
+            }
+        }
+
+        public static void OnModLateUpdate()
+        {
+            if (sceneName == "MainMenu")
+            {
+                if(customCharacterManager.importedCharacters)
+                {
+                    customCharacterManager.update(); // really REALLY make sure pictures stay...
                 }
             }
         }

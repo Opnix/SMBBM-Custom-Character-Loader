@@ -12,13 +12,13 @@ namespace CustomCharacterLoader
     class CustomCharacterManager : MonoBehaviour
     {
         public bool importedCharacters = false;
-        private List<CustomCharacter> characters = new List<CustomCharacter>();
+        public List<CustomCharacter> characters = new List<CustomCharacter>();
 
-        public bool checkSelectedCharacter = true;
-        private int selectedCharacterID = 0;
-        public CustomCharacter selectedCharacter;
+        public static List<int> BannerID = new List<int>();
+        public static List<String> BannerNames = new List<String>();
 
         public bool loadCharacter = false;
+        public CustomCharacter selectedCharacter;
         private static GameObject CustomMonkeyObject;
 
         public CustomCharacterManager() { }
@@ -43,22 +43,22 @@ namespace CustomCharacterLoader
             }
         }
 
+        // Create Character select icons for all custom characters
         public void ImportCharacters(SelMgCharaItemDataListObject charactersList)
         {
             foreach (CustomCharacter chara in characters)
             {
                 chara.CreateItemData(charactersList);
+                BannerID.Add(chara.icon.GetInstanceID());
+                BannerNames.Add(chara.charaName);
             }
-            Console.WriteLine("Created Custom Character Select Slots.");
+            Console.WriteLine("Created Custom Character Slots.");
             importedCharacters = true;
         }
 
-        public void update(SelMainThemeBeltView characterSelectDisplay)
+        // Update Icons
+        public void update()
         {
-            checkSelectedCharacter = true;
-            loadCharacter = false;
-
-            // Update Icons and Character Name Banner
             foreach (CustomCharacter chara in characters)
             {
                 // Update Icons
@@ -69,35 +69,21 @@ namespace CustomCharacterLoader
                 if (!chara.banner)
                 {
                     chara.banner = chara.asset.LoadAsset<Sprite>("banner");
-                    Console.WriteLine("finding banner");
                 }
                 chara.itemData.costumeList[0].spritePicture = chara.banner;
                 chara.itemData.costumeList[0].spriteIcon = chara.icon;
-
-                // update image thumbnail
-                if (characterSelectDisplay.GetThumbnail())
-                {
-                    // get last selected character
-                    if (!characterSelectDisplay.GetThumbnail().name.StartsWith("t_tmb"))
-                    {
-                        selectedCharacterID = characterSelectDisplay.GetThumbnail().GetInstanceID();
-                    }
-                    // Update Name Banner
-                    if (characterSelectDisplay.GetThumbnail().GetInstanceID() == chara.banner.GetInstanceID())
-                    {
-                        characterSelectDisplay.SetCharacterName(chara.charaName);
-                    }
-                }
             }
         }
 
+        // Check if a custom character is selected
         public void IsCustomCharacterSelected()
         {
             loadCharacter = false;
-            checkSelectedCharacter = false;
+            Patches.MgCharaOnSubmitPatch.checkSelectedCharacter = false;
+            Patches.TaCharaOnSubmitPatch.checkSelectedCharacter = false;
             foreach (CustomCharacter chara in characters)
             {
-                if (selectedCharacterID == chara.banner.GetInstanceID())
+                if (Patches.MgCharaOnSubmitPatch.selectedCharacterID == chara.icon.GetInstanceID())
                 {
                     selectedCharacter = chara;
                     loadCharacter = true;

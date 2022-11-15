@@ -16,34 +16,31 @@
 
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\smbbm\0Harmony.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\smbbm\managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Il2Cppmscorlib">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\smbbm\managed\Il2Cppmscorlib.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Il2Cppmscorlib.dll</HintPath>
     </Reference>
     <Reference Include="UnhollowerBaseLib">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\smbbm\managed\UnhollowerBaseLib.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnhollowerBaseLib.dll</HintPath>
     </Reference>
     <Reference Include="UnhollowerRuntimeLib">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\smbbm\managed\UnhollowerRuntimeLib.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnhollowerRuntimeLib.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\smbbm\managed\UnityEngine.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\smbbm\managed\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\smbbm\managed\UnityEngine.AssetBundleModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AudioModule">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\smbbm\managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\smbbm\managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 
