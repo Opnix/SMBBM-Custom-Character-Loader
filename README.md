@@ -13,4 +13,3 @@ This mod requires [Banana Mod Manager](https://github.com/MorsGames/BananaModMan
 ### Yet to be Implemented Features:
 - Import custom banana assets into the game.
 - Import custom Pause icon.
-- Stop name banner from staying on screen after character select.
