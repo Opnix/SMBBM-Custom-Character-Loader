@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using Flash2;
 using UnityEngine;
+using UnhollowerBaseLib;
 using Object = UnityEngine.Object;
 
 namespace CustomCharacterLoader
@@ -12,6 +13,7 @@ namespace CustomCharacterLoader
         public string charaName = "";
         private string asset_name = "";
         private string voiceBank = "";
+        private bool game_shaders = false;
 
         // Super Monkey Ball Objects
         public SelMgCharaItemData itemData;
@@ -26,6 +28,7 @@ namespace CustomCharacterLoader
         {
             public string chara_name { get; set; }
             public string voice_bank { get; set; }
+            public bool game_shaders { get; set; }
         }
 
         // reads a json file then get the asset bundle and base_character
@@ -43,6 +46,7 @@ namespace CustomCharacterLoader
 
             this.charaName = template.chara_name;
             this.asset_name = asset_name;
+            this.game_shaders = template.game_shaders;
 
             Console.WriteLine("Loading Asset Bundle: " + this.asset_name);
 
@@ -102,9 +106,17 @@ namespace CustomCharacterLoader
         public GameObject InitializeCharacter(Shader shader)
         {
             GameObject modModel = Object.Instantiate(this.asset.LoadAsset<GameObject>("character"));
-            modModel.GetComponentInChildren<SkinnedMeshRenderer>().material.shader = shader;
-            modModel.SetActive(true);
+            Il2CppReferenceArray<Material> materials = modModel.GetComponentInChildren<SkinnedMeshRenderer>().materials;
 
+            if (this.game_shaders)
+            {
+                foreach (Material material in materials)
+                {
+                    material.shader = shader;
+                }
+            }
+
+            modModel.SetActive(true);
             return modModel;
         }
     }
