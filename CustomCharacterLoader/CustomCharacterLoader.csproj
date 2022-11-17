@@ -24,6 +24,9 @@
     <Reference Include="Il2Cppmscorlib">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Il2Cppmscorlib.dll</HintPath>
     </Reference>
+    <Reference Include="Il2CppSystem">
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Il2CppSystem.dll</HintPath>
+    </Reference>
     <Reference Include="UnhollowerBaseLib">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnhollowerBaseLib.dll</HintPath>
     </Reference>

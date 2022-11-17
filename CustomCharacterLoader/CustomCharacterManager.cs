@@ -19,7 +19,13 @@ namespace CustomCharacterLoader
 
         public bool loadCharacter = false;
         public CustomCharacter selectedCharacter;
-        private static GameObject CustomMonkeyObject;
+        private GameObject CustomMonkeyObject;
+
+        // removing Aiai costume
+        public bool removedCostume = false;
+        public CharaCustomizeManager charaCustomizeManager = null;
+        private CharaCustomize.PartsSet partSet;
+        private CharaCustomize.PartsKeyDict costumeParts;
 
         public CustomCharacterManager() { }
         public CustomCharacterManager(IntPtr value) : base(value) { }
@@ -57,21 +63,11 @@ namespace CustomCharacterLoader
         }
 
         // Update Icons
-        public void update()
+        public void Update()
         {
             foreach (CustomCharacter chara in characters)
             {
-                // Update Icons
-                if (!chara.icon)
-                {
-                    chara.icon = chara.asset.LoadAsset<Sprite>("icon");
-                }
-                if (!chara.banner)
-                {
-                    chara.banner = chara.asset.LoadAsset<Sprite>("banner");
-                }
-                chara.itemData.costumeList[0].spritePicture = chara.banner;
-                chara.itemData.costumeList[0].spriteIcon = chara.icon;
+                chara.UpdateCharacterSelect();
             }
         }
 
@@ -81,17 +77,48 @@ namespace CustomCharacterLoader
             loadCharacter = false;
             Patches.MgCharaOnSubmitPatch.checkSelectedCharacter = false;
             Patches.TaCharaOnSubmitPatch.checkSelectedCharacter = false;
+
             foreach (CustomCharacter chara in characters)
             {
                 if (Patches.MgCharaOnSubmitPatch.selectedCharacterID == chara.icon.GetInstanceID())
                 {
                     selectedCharacter = chara;
                     loadCharacter = true;
+
+                    // Prep to remove costume parts if needed
+                    if (charaCustomizeManager.m_PartsSetDict.CollectionInstance.ContainsKey(chara.itemData.characterKind))
+                    {
+                        partSet = charaCustomizeManager.m_PartsSetDict.CollectionInstance[chara.itemData.characterKind][1];
+                        costumeParts = partSet.m_PartsKeyDict;
+
+                        CharaCustomize.PartsKeyDict ballOnly = new CharaCustomize.PartsKeyDict();
+                        if (partSet.m_PartsKeyDict.ContainsKey(CharaCustomize.eAssignPos.Ball))
+                        {
+                            ballOnly.Add(CharaCustomize.eAssignPos.Ball, costumeParts[CharaCustomize.eAssignPos.Ball]);
+                        }
+
+                        partSet.m_PartsKeyDict = ballOnly;
+                        removedCostume = true;
+                        Console.WriteLine("removed costume");
+                    }
                     break;
                 }
             }
         }
 
+        // revert any changes when not in main game
+        public void RevertChanges()
+        {
+            // restore old costume for base character
+            if(removedCostume)
+            {
+                partSet.m_PartsKeyDict = costumeParts;
+                removedCostume = false;
+                Console.WriteLine("restored costume");
+            }
+        }
+
+        // insert character into the game
         public void LoadCustomCharacter()
         {
             // look for player object

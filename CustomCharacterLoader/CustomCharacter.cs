@@ -11,9 +11,10 @@ namespace CustomCharacterLoader
     public class CustomCharacter : UnityEngine.Object
     {
         public string charaName = "";
-        private string asset_name = "";
+        private string assetName = "";
         private string voiceBank = "";
-        private bool game_shaders = false;
+        private bool gameShaders = false;
+        private bool reskin = false;
 
         // Super Monkey Ball Objects
         public SelMgCharaItemData itemData;
@@ -29,6 +30,7 @@ namespace CustomCharacterLoader
             public string chara_name { get; set; }
             public string voice_bank { get; set; }
             public bool game_shaders { get; set; }
+            public bool reskin { get; set; }
         }
 
         // reads a json file then get the asset bundle and base_character
@@ -45,20 +47,21 @@ namespace CustomCharacterLoader
             }
 
             this.charaName = template.chara_name;
-            this.asset_name = asset_name;
-            this.game_shaders = template.game_shaders;
+            this.assetName = asset_name;
+            this.gameShaders = template.game_shaders;
+            this.reskin = template.reskin;
 
-            Console.WriteLine("Loading Asset Bundle: " + this.asset_name);
+            Console.WriteLine("Loading Asset Bundle: " + this.assetName);
 
             // get asset bundle
-            this.asset = AssetBundle.LoadFromFile(Path.Combine(CHARA_PATH, this.asset_name));
+            this.asset = AssetBundle.LoadFromFile(Path.Combine(CHARA_PATH, this.assetName));
             if (this.asset == null)
             {
-                Console.WriteLine("Cant find Asset bundle for " + CHARA_PATH + this.asset_name);
+                Console.WriteLine("Cant find Asset bundle for " + CHARA_PATH + this.assetName);
             }
             else
             {
-                Console.WriteLine("Loaded Asset Bundle: " + this.asset_name);
+                Console.WriteLine("Loaded Asset Bundle: " + this.assetName);
             }
         }
 
@@ -103,12 +106,27 @@ namespace CustomCharacterLoader
             itemDataList.m_ItemDataList.Add(this.itemData);
         }
 
+        public void UpdateCharacterSelect()
+        {
+            // Update Icons
+            if (!this.icon)
+            {
+                this.icon = this.asset.LoadAsset<Sprite>("icon");
+            }
+            if (!this.banner)
+            {
+                this.banner = this.asset.LoadAsset<Sprite>("banner");
+            }
+            this.itemData.costumeList[0].spritePicture = this.banner;
+            this.itemData.costumeList[0].spriteIcon = this.icon;
+        }
+
         public GameObject InitializeCharacter(Shader shader)
         {
             GameObject modModel = Object.Instantiate(this.asset.LoadAsset<GameObject>("character"));
             Il2CppReferenceArray<Material> materials = modModel.GetComponentInChildren<SkinnedMeshRenderer>().materials;
 
-            if (this.game_shaders)
+            if (this.gameShaders)
             {
                 foreach (Material material in materials)
                 {

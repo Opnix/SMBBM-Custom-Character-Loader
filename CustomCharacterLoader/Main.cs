@@ -33,6 +33,7 @@ namespace CustomCharacterLoader
             // Patches
             Patches.MgCharaOnSubmitPatch.CreateDetour();
             Patches.TaCharaOnSubmitPatch.CreateDetour();
+            //Patches.BallPatch.CreateDetour();
         }
 
         // Mod Late Update (Split by scene names)
@@ -62,13 +63,23 @@ namespace CustomCharacterLoader
                         Patches.MgCharaNamePatch.CreateDetour();
                         Patches.TaCharaNamePatch.CreateDetour();
 
-                        customCharacterManager.update(); // make sure pictures stay
+                        customCharacterManager.Update(); // make sure pictures stay
                     }
+                }
+                // get costume manager 
+                else if(customCharacterManager.charaCustomizeManager == null)
+                {
+                    CharaCustomizeManager[] charaCustomizeContainer = Resources.FindObjectsOfTypeAll<CharaCustomizeManager>();
+                    if (charaCustomizeContainer != null && charaCustomizeContainer.Length > 0)
+                    {
+                        customCharacterManager.charaCustomizeManager = charaCustomizeContainer[0];
+                    }    
                 }
                 // After Characters are imported
                 else
                 {
-                    customCharacterManager.update(); // really make sure pictures stay
+                    customCharacterManager.RevertChanges();
+                    customCharacterManager.Update(); // really make sure pictures stay
                 }
             }
             // Scene = MainGame
@@ -88,7 +99,7 @@ namespace CustomCharacterLoader
             {
                 if(customCharacterManager.importedCharacters)
                 {
-                    customCharacterManager.update(); // really REALLY make sure pictures stay...
+                    customCharacterManager.Update(); // really REALLY make sure pictures stay...
                 }
             }
         }

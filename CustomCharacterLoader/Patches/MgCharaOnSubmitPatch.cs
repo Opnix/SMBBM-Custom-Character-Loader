@@ -13,19 +13,19 @@ namespace CustomCharacterLoader.Patches
     public static class MgCharaOnSubmitPatch
     {
         private delegate void OnSubmitDelegate(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData);
-        private static OnSubmitDelegate OnSubmitDelegateInstance;
-        private static OnSubmitDelegate OnSubmitDelegateOriginal;
+        private static OnSubmitDelegate OnSubmitInstance;
+        private static OnSubmitDelegate OnSubmitOriginal;
 
         public static int selectedCharacterID;
         public static bool checkSelectedCharacter = true;
         public static unsafe void CreateDetour()
         {
-            OnSubmitDelegateInstance = onSubmit;
+            OnSubmitInstance = onSubmit;
 
             var original = typeof(SelMgCharaSelectWindow).GetMethod(nameof(SelMgCharaSelectWindow.onSubmit), AccessTools.all);
             var methodInfo = UnityVersionHandler.Wrap((Il2CppMethodInfo*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(original).GetValue(null));
 
-            OnSubmitDelegateOriginal = ClassInjector.Detour.Detour(methodInfo.MethodPointer, OnSubmitDelegateInstance);
+            OnSubmitOriginal = ClassInjector.Detour.Detour(methodInfo.MethodPointer, OnSubmitInstance);
         }
         static void onSubmit(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData)
         {
@@ -33,7 +33,7 @@ namespace CustomCharacterLoader.Patches
             selectedCharacterID = selectedChara.costumeList[selectedChara.costumeIndex].spriteIcon.GetInstanceID();
             checkSelectedCharacter = true;
 
-            OnSubmitDelegateOriginal(_thisPtr, playerIndex, inputLayer, itemData);
+            OnSubmitOriginal(_thisPtr, playerIndex, inputLayer, itemData);
         }
     }
 }

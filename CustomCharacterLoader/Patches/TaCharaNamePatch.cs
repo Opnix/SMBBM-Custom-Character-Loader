@@ -12,7 +12,7 @@ using UnhollowerRuntimeLib;
 
 namespace CustomCharacterLoader.Patches
 {
-    internal class TaCharaNamePatch
+    public static class TaCharaNamePatch
     {
         private delegate void onSelectDelegate(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData);
         private static onSelectDelegate OnSelectInstance;
