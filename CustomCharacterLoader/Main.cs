@@ -5,15 +5,26 @@ using Object = UnityEngine.Object;
 using System.IO;
 using System;
 using UnhollowerRuntimeLib;
+using System.Reflection;
 
 namespace CustomCharacterLoader
 {
     public static class Main
     {
         public static string PATH = "";
+        public static string GUEST_CHARACTER_PATH = "";
         private static string sceneName;
-        private static CustomCharacterManager customCharacterManager = null;
-                
+        public static CustomCharacterManager customCharacterManager = null;
+        private static MonkeyVoices monkeyVoices = null;
+            
+        // Console Text
+        public static void Output(string text)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("CustomCharacterLoader: " + text);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
         // Mod Load
         public static void OnModLoad(Dictionary<string, object> settings)
         {
@@ -22,18 +33,32 @@ namespace CustomCharacterLoader
         // Mod Start
         public static void OnModStart()
         {
-            PATH = System.Reflection.Assembly.GetCallingAssembly().Location.Split(new string[] { "BananaModManager.Loader.IL2Cpp.dll" }, System.StringSplitOptions.None)[0] + "mods\\CustomCharacterLoader\\Characters";
+            PATH = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Characters\");
 
             // create custom character manager
             ClassInjector.RegisterTypeInIl2Cpp(typeof(CustomCharacterManager));
+            
             var obj = new GameObject { hideFlags = HideFlags.HideAndDontSave };
             Object.DontDestroyOnLoad(obj);
             customCharacterManager = new CustomCharacterManager(obj.AddComponent(Il2CppType.Of<CustomCharacterManager>()).Pointer, PATH);
-            
+
+            // Get Guest Character Pack assembly path
+            Assembly assembly = Assembly.GetCallingAssembly();
+            Type loader = assembly.GetType("BananaModManager.Loader.IL2Cpp.Loader");
+            PropertyInfo infoList = loader.GetProperty("Mods");
+            List<BananaModManager.Shared.Mod> mods = (List<BananaModManager.Shared.Mod>)infoList.GetValue(loader);
+            foreach (var mod in mods)
+            {
+                string modName = mod.GetAssembly().ToString().Split(',')[0];
+                if (modName == "GuestCharacters")
+                {
+                    
+                }
+            }
+
             // Patches
             Patches.MgCharaOnSubmitPatch.CreateDetour();
             Patches.TaCharaOnSubmitPatch.CreateDetour();
-            //Patches.BallPatch.CreateDetour();
         }
 
         // Mod Late Update (Split by scene names)
@@ -45,11 +70,16 @@ namespace CustomCharacterLoader
             if (customCharacterManager.loadCharacter)
             {
                 customCharacterManager.LoadCustomCharacter();
+                if(monkeyVoices != null)
+                {
+                    monkeyVoices.LoadSounds(customCharacterManager.selectedCharacter);
+                }
             }
 
             // Scene = MainMenu
             if (sceneName == "MainMenu")
             {
+                customCharacterManager.loadCharacter = false;
                 // Import characters
                 if (!customCharacterManager.importedCharacters)
                 {
@@ -97,7 +127,7 @@ namespace CustomCharacterLoader
         {
             if (sceneName == "MainMenu")
             {
-                if(customCharacterManager.importedCharacters)
+                if (customCharacterManager.importedCharacters)
                 {
                     customCharacterManager.Update(); // really REALLY make sure pictures stay...
                 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
+using System.Reflection;
 using Flash2;
 using UnityEngine;
 using UnhollowerBaseLib;
@@ -25,43 +26,58 @@ namespace CustomCharacterLoader
         public Sprite banner;
         public Sprite pause;
 
+        // Sound Files
+        public string monkeeAcbPath = "";
+        public string bananaAcbPath = "";
+
         private class CharacterTemp
         {
-            public string chara_name { get; set; }
-            public string voice_bank { get; set; }
+            public string asset_bundle { get; set; }
+            public string base_monkey { get; set; }
+            public string monkeeAcb { get; set; }
+            public string bananaAcb { get; set; }
             public bool game_shaders { get; set; }
             public bool reskin { get; set; }
         }
 
         // reads a json file then get the asset bundle and base_character
-        public CustomCharacter(string asset_name, string json, string CHARA_PATH)
+        public CustomCharacter(string characterName, string json, string dir)
         {
             CharacterTemp template = JsonSerializer.Deserialize<CharacterTemp>(json);
-            if (template.voice_bank == "")
+            if (template.base_monkey == "")
             {
                 this.voiceBank = "Aiai";
             }
             else
             {
-                this.voiceBank = template.voice_bank;
+                this.voiceBank = template.base_monkey;
             }
 
-            this.charaName = template.chara_name;
-            this.assetName = asset_name;
+            this.charaName = characterName;
+            this.assetName = template.asset_bundle;
             this.gameShaders = template.game_shaders;
             this.reskin = template.reskin;
 
-            Console.WriteLine("Loading Asset Bundle: " + this.assetName);
-
             // get asset bundle
-            this.asset = AssetBundle.LoadFromFile(Path.Combine(CHARA_PATH, this.assetName));
+            Main.Output("Loading Character: " + this.charaName);
+            this.asset = AssetBundle.LoadFromFile(Path.Combine(dir, this.assetName));
             if (this.asset == null)
             {
-                Console.WriteLine("Cant find Asset bundle for " + CHARA_PATH + this.assetName);
+                Main.Output("Cant find Asset bundle for " + dir + this.assetName);
             }
             else
             {
-                Console.WriteLine("Loaded Asset Bundle: " + this.assetName);
+                Main.Output("Loaded Asset Bundle: " + this.assetName);
+
+                // get sound files if any
+                if (template.monkeeAcb != "")
+                {
+                    monkeeAcbPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Sounds\Monkeys\" + template.monkeeAcb + ".acb");
+                }
+                if (template.bananaAcb != "")
+                {
+                    bananaAcbPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Sounds\Bananas\" + template.bananaAcb + ".acb");
+                }
             }
         }
 

@@ -21,6 +21,15 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="BananaModManager.Shared">
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\BananaModManager.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="GuestCharacters">
+      <HintPath>..\..\..\..\Desktop\Guest Characters Only\bin\Debug\GuestCharacters.dll</HintPath>
+    </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Il2Cppmscorlib.dll</HintPath>
     </Reference>

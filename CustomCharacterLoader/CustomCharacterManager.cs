@@ -6,17 +6,23 @@ using System.Text;
 using System.Threading.Tasks;
 using Flash2;
 using UnityEngine;
+using UnhollowerBaseLib;
+using UnhollowerBaseLib.Runtime;
+using UnhollowerRuntimeLib;
 
 namespace CustomCharacterLoader
 {
-    class CustomCharacterManager : MonoBehaviour
+    public class CustomCharacterManager : MonoBehaviour
     {
-        public bool importedCharacters = false;
-        public List<CustomCharacter> characters = new List<CustomCharacter>();
-
+        // name titles for custom characters
         public static List<int> BannerID = new List<int>();
         public static List<String> BannerNames = new List<String>();
 
+        // importing stuff
+        public bool importedCharacters = false;
+        public List<CustomCharacter> characters = new List<CustomCharacter>();
+
+        // loading character stuff
         public bool loadCharacter = false;
         public CustomCharacter selectedCharacter;
         private GameObject CustomMonkeyObject;
@@ -28,23 +34,26 @@ namespace CustomCharacterLoader
         private CharaCustomize.PartsKeyDict costumeParts;
 
         public CustomCharacterManager() { }
-        public CustomCharacterManager(IntPtr value) : base(value) { }
-        public CustomCharacterManager(IntPtr value, string PATH) : base(value)
+        public CustomCharacterManager(IntPtr ptr) : base(ptr) { }
+        public CustomCharacterManager(IntPtr ptr, string PATH) : base(ptr)
         {
-            // Reads all the Json files in Character folder
-            foreach (string json in Directory.GetFiles(PATH, "*.json"))
+            // go to each folder in Character folder
+            foreach (string dir in Directory.GetDirectories(PATH))
             {
-                StreamReader reader = new StreamReader(json);
-                string data = reader.ReadToEnd();
-
-                string name = json.Substring(json.LastIndexOf("\\")+1);
-                name = name.Remove(name.Length - 5); // remove .json
-
-                CustomCharacter character = new CustomCharacter(name, data, PATH);
-
-                if (character.asset != null)
+                // Reads all the Json files in folder
+                foreach (string json in Directory.GetFiles(dir, "*.json"))
                 {
-                    characters.Add(character);
+                    StreamReader reader = new StreamReader(json);
+                    string data = reader.ReadToEnd();
+
+                    string name = dir.Substring(dir.LastIndexOf("\\") + 1);
+
+                    CustomCharacter character = new CustomCharacter(name, data, dir);
+
+                    if (character.asset != null)
+                    {
+                        characters.Add(character);
+                    }
                 }
             }
         }
@@ -58,7 +67,7 @@ namespace CustomCharacterLoader
                 BannerID.Add(chara.icon.GetInstanceID());
                 BannerNames.Add(chara.charaName);
             }
-            Console.WriteLine("Created Custom Character Slots.");
+            Main.Output("Created Custom Character Slots.");
             importedCharacters = true;
         }
 
@@ -99,7 +108,7 @@ namespace CustomCharacterLoader
 
                         partSet.m_PartsKeyDict = ballOnly;
                         removedCostume = true;
-                        Console.WriteLine("removed costume");
+                        Main.Output("removed costume");
                     }
                     break;
                 }
@@ -114,7 +123,7 @@ namespace CustomCharacterLoader
             {
                 partSet.m_PartsKeyDict = costumeParts;
                 removedCostume = false;
-                Console.WriteLine("restored costume");
+                Main.Output("restored costume");
             }
         }
 
@@ -141,6 +150,7 @@ namespace CustomCharacterLoader
                     CustomMonkeyObject.transform.parent = target_model.transform;
                     playerObject.GetComponent<MonkeyRef>().m_Animator = CustomMonkeyObject.GetComponentInChildren<Animator>();
                     playerObject.GetComponent<Monkey>().m_Animator = CustomMonkeyObject.GetComponentInChildren<Animator>();
+                    MonkeyVoices.load = true;
                 }
             }
         }
