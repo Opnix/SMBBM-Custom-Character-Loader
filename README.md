@@ -3,9 +3,9 @@
 
 A mod made for Super Monkey Ball: Banana Mania. This mod adds the ability to add custom characters into the game by importing custom asset bundles.
 
-### Mod Requirements
--[Banana Mod Manager](https://github.com/MorsGames/BananaModManager)
--[Guest Character Voice Pack](https://gamebanana.com/mods/331507)
+### Mod Requirements:
+- [Banana Mod Manager](https://github.com/MorsGames/BananaModManager)
+- [Guest Character Voice Pack](https://gamebanana.com/mods/331507)
 
 ### Special Thanks To:
 - Mors: Created BMM
