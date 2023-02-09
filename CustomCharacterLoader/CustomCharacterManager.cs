@@ -81,11 +81,11 @@ namespace CustomCharacterLoader
         }
 
         // Check if a custom character is selected
-        public void IsCustomCharacterSelected()
+        public void GetCustomCharacterSelected()
         {
             loadCharacter = false;
-            Patches.MgCharaOnSubmitPatch.checkSelectedCharacter = false;
-            Patches.TaCharaOnSubmitPatch.checkSelectedCharacter = false;
+            Patches.MgCharaOnSubmitPatch.isCustomCharacter = false;
+            Patches.TaCharaOnSubmitPatch.isCustomCharacter = false;
 
             foreach (CustomCharacter chara in characters)
             {
@@ -108,7 +108,6 @@ namespace CustomCharacterLoader
 
                         partSet.m_PartsKeyDict = ballOnly;
                         removedCostume = true;
-                        Main.Output("removed costume");
                     }
                     break;
                 }

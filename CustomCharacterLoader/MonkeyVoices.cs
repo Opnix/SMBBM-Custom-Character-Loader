@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
 using Flash2;
-using UnityEngine;
 using Object = UnityEngine.Object;
 using System.IO;
 using System;
 using UnhollowerRuntimeLib;
-using UnhollowerBaseLib;
-using UnhollowerBaseLib.Runtime;
-using System.Reflection;
 using System.Linq;
 
 namespace CustomCharacterLoader
@@ -57,6 +53,7 @@ namespace CustomCharacterLoader
             _monkeeArray = new string[] { "aiai", "baby", "doctor", "gongon", "jam", "jet", "meemee", "yanyan" };
             _guestArray = new string[] { "beat", "kiryu", "sonic", "tails", "dlc01", "dlc02", "dlc03" };
             _consoleArray = new string[] { "dreamcast", "gamegear", "segasaturn" };
+            _dlcArray = new string[] { "suezo", "hellokitty", "morgana" };
 
             _monkeeType = _player.charaKind.ToString().ToLower();
 
@@ -75,11 +72,11 @@ namespace CustomCharacterLoader
 
         private void Start()
         {
+            // check if there's custom voice packs
             bool monkeeVoiceBool = true;
             bool bananaVoiceBool = true;
             if (Main.customCharacterManager.selectedCharacter.monkeeAcbPath != "")
             {
-                Main.Output(Main.customCharacterManager.selectedCharacter.monkeeAcbPath);
                 _monkeeAcb = CriAtomExAcb.LoadAcbFile(null, Main.customCharacterManager.selectedCharacter.monkeeAcbPath, null);
                 if (_monkeeAcb != null)
                 {
@@ -95,61 +92,39 @@ namespace CustomCharacterLoader
                 }
             }
 
+            // assign any missing voice packs to default
+            string monkeePath = "";
+            string bananaPath = "";
             if (_monkeeArray.Contains(_monkeeType))
             {
-                if (monkeeVoiceBool)
-                {
-                    string monkeePath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Monkeys\vo_" + _monkeeType + ".acb");
-                    _monkeeAcb = CriAtomExAcb.LoadAcbFile(null, monkeePath, null);
-                }
-
-                if (bananaVoiceBool)
-                {
-                    string bananaPath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Bananas\bananas.acb");
-                    _bananaAcb = CriAtomExAcb.LoadAcbFile(null, bananaPath, null);
-                }
+                if (monkeeVoiceBool) { monkeePath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Monkeys\vo_" + _monkeeType + ".acb"); }
+                if (bananaVoiceBool) { bananaPath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Bananas\bananas.acb"); }
             }
             else if (_consoleArray.Contains(_monkeeType))
             {
-                if (monkeeVoiceBool)
-                {
-                    string monkeePath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Consoles\vo_" + _monkeeType + ".acb");
-                    _monkeeAcb = CriAtomExAcb.LoadAcbFile(null, monkeePath, null);
-                }
-
-                if (bananaVoiceBool)
-                {
-                    string bananaPath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Bananas\bananas.acb");
-                    _bananaAcb = CriAtomExAcb.LoadAcbFile(null, bananaPath, null);
-                }
+                if (monkeeVoiceBool) { monkeePath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Consoles\vo_" + _monkeeType + ".acb"); }
+                if (bananaVoiceBool) { bananaPath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Bananas\bananas.acb"); }
             }
             else if (_guestArray.Contains(_monkeeType))
             {
-                if (monkeeVoiceBool)
-                {
-                    string monkeePath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Guests\vo_" + _monkeeType + ".acb");
-                    _monkeeAcb = CriAtomExAcb.LoadAcbFile(null, monkeePath, null);
-                }
-
-                if (bananaVoiceBool)
-                {
-                    string bananaPath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Bananas\bananas_" + _monkeeType + ".acb");
-                    _bananaAcb = CriAtomExAcb.LoadAcbFile(null, bananaPath, null);
-                }
+                if (monkeeVoiceBool) { monkeePath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Guests\vo_" + _monkeeType + ".acb"); }
+                if (bananaVoiceBool) { bananaPath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Bananas\bananas_" + _monkeeType + ".acb"); }
+            }
+            else if (_dlcArray.Contains(_monkeeType))
+            {
+                if (monkeeVoiceBool) { monkeePath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\DLC\vo_" + _monkeeType + ".acb"); }
+                if (bananaVoiceBool) { bananaPath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Bananas\bananas_" + _monkeeType + ".acb"); }
             }
             else
             {
-                if (monkeeVoiceBool)
-                {
-                    string monkeePath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\DLC\vo_muted.acb");
-                    _monkeeAcb = CriAtomExAcb.LoadAcbFile(null, monkeePath, null);
-                }
-                if (bananaVoiceBool)
-                {
-                    string bananaPath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Bananas\bananas_muted.acb");
-                    _bananaAcb = CriAtomExAcb.LoadAcbFile(null, bananaPath, null);
-                }
+                if (monkeeVoiceBool) { monkeePath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\DLC\vo_muted.acb"); }
+                else { monkeePath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\DLC\vo_muted.acb"); }
+
+                if (bananaVoiceBool) { bananaPath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Bananas\bananas_muted.acb"); }
+                else { bananaPath = Path.Combine(Main.GUEST_CHARACTER_PATH, @"Sounds\Bananas\bananas_muted.acb"); }
             }
+            _monkeeAcb = CriAtomExAcb.LoadAcbFile(null, monkeePath, null);
+            _bananaAcb = CriAtomExAcb.LoadAcbFile(null, bananaPath, null);
         }
     }
 }

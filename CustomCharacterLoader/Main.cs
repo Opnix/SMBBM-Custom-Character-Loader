@@ -115,10 +115,10 @@ namespace CustomCharacterLoader
             // Scene = MainGame
             else if (sceneName == "MainGame")
             {
-                // Check if custom character is selected
-                if (Patches.MgCharaOnSubmitPatch.checkSelectedCharacter || Patches.TaCharaOnSubmitPatch.checkSelectedCharacter)
+                // Get the character data if custom character is selected
+                if (Patches.MgCharaOnSubmitPatch.isCustomCharacter || Patches.TaCharaOnSubmitPatch.isCustomCharacter)
                 {
-                    customCharacterManager.IsCustomCharacterSelected();
+                    customCharacterManager.GetCustomCharacterSelected();
                 }
             }
         }

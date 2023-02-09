@@ -10,28 +10,41 @@ namespace CustomCharacterLoader.Patches
 {
     public static class TaCharaOnSubmitPatch
     {
-        private delegate void OnSubmitDelegate(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData);
-        private static OnSubmitDelegate OnSubmitInstance;
-        private static OnSubmitDelegate OnSubmitOriginal;
+        private delegate void Delegate(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData);
+        private static Delegate customSubmit;
+        private static Delegate originalSubmit;
 
-        public static int selectedCharacterID;
-        public static bool checkSelectedCharacter = true;
+        public static bool isCustomCharacter { get; set; }
+        public static int selectedCharacterID { get; set; }
         public static unsafe void CreateDetour()
         {
-            OnSubmitInstance = onSubmit;
+            customSubmit = HandleSubmit;
 
-            var original = typeof(SelTaCharaSelectWindow).GetMethod(nameof(SelTaCharaSelectWindow.onSubmit), AccessTools.all);
-            var methodInfo = UnityVersionHandler.Wrap((Il2CppMethodInfo*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(original).GetValue(null));
+            var method = typeof(SelTaCharaSelectWindow).GetMethod(nameof(SelTaCharaSelectWindow.onSubmit), AccessTools.all);
+            var methodInfo = UnityVersionHandler.Wrap((Il2CppMethodInfo*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null));
 
-            OnSubmitOriginal = ClassInjector.Detour.Detour(methodInfo.MethodPointer, OnSubmitInstance);
+            originalSubmit = ClassInjector.Detour.Detour(methodInfo.MethodPointer, customSubmit);
         }
-        static void onSubmit(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData)
+        static void HandleSubmit(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData)
         {
             SelMgCharaItemData selectedChara = new(itemData);
-            selectedCharacterID = selectedChara.costumeList[selectedChara.costumeIndex].spriteIcon.GetInstanceID();
-            checkSelectedCharacter = true;
 
-            OnSubmitOriginal(_thisPtr, playerIndex, inputLayer, itemData);
+            // check if character is a custom character
+            isCustomCharacter = false;
+            selectedCharacterID = selectedChara.costumeList[selectedChara.costumeIndex].spriteIcon.GetInstanceID();
+            foreach (CustomCharacter chara in Main.customCharacterManager.characters)
+            {
+                if (selectedCharacterID == chara.icon.GetInstanceID())
+                {
+                    isCustomCharacter = true;
+                    selectedCharacterID = selectedChara.costumeList[selectedChara.costumeIndex].spriteIcon.GetInstanceID();
+                    selectedChara.costumeIndex = 0;
+                    break;
+                }
+            }
+
+            if (isCustomCharacter) { originalSubmit(_thisPtr, playerIndex, inputLayer, selectedChara.Pointer); }
+            else { originalSubmit(_thisPtr, playerIndex, inputLayer, itemData); }
         }
     }
 }

@@ -15,7 +15,6 @@ namespace CustomCharacterLoader
         private string assetName = "";
         private string voiceBank = "";
         private bool gameShaders = false;
-        private bool reskin = false;
 
         // Super Monkey Ball Objects
         public SelMgCharaItemData itemData;
@@ -37,7 +36,6 @@ namespace CustomCharacterLoader
             public string monkeeAcb { get; set; }
             public string bananaAcb { get; set; }
             public bool game_shaders { get; set; }
-            public bool reskin { get; set; }
         }
 
         // reads a json file then get the asset bundle and base_character
@@ -56,7 +54,6 @@ namespace CustomCharacterLoader
             this.charaName = characterName;
             this.assetName = template.asset_bundle;
             this.gameShaders = template.game_shaders;
-            this.reskin = template.reskin;
 
             // get asset bundle
             Main.Output("Loading Character: " + this.charaName);
