@@ -12,22 +12,23 @@ namespace CustomCharacterLoader.Patches
     // Patch for the onSubmit() function so the mod can know what character was selected.
     public static class MgCharaOnSubmitPatch
     {
-        private delegate void SubmitHandler(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData);
-        private static SubmitHandler customSubmit;
-        private static SubmitHandler originalSubmit;
+        private delegate void Delegate(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData);
+        private static Delegate customSubmit;
+        private static Delegate originalSubmit;
 
-        public static bool isCustomCharacter { get; set; }
+        public static bool isCustomCharacter { get; set; } = false;
         public static int selectedCharacterID { get; set; }
         public static unsafe void CreateDetour()
         {
-            customSubmit = HandleSubmit;
+            customSubmit = OnSubmit;
 
             var method = typeof(SelMgCharaSelectWindow).GetMethod(nameof(SelMgCharaSelectWindow.onSubmit), AccessTools.all);
             var methodInfo = UnityVersionHandler.Wrap((Il2CppMethodInfo*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null));
 
             originalSubmit = ClassInjector.Detour.Detour(methodInfo.MethodPointer, customSubmit);
         }
-        static void HandleSubmit(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData)
+
+        static void OnSubmit(IntPtr _thisPtr, IntPtr playerIndex, IntPtr inputLayer, IntPtr itemData)
         {
             SelMgCharaItemData selectedChara = new(itemData);
 
@@ -40,7 +41,7 @@ namespace CustomCharacterLoader.Patches
                 {
                     isCustomCharacter = true;
                     selectedCharacterID = selectedChara.costumeList[selectedChara.costumeIndex].spriteIcon.GetInstanceID();
-                    selectedChara.costumeIndex = 0;
+                    selectedChara.costumeIndex = 0; //LOOK INTO
                     break;
                 }
             }
