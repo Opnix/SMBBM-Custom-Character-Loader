@@ -7,7 +7,7 @@ using UnityEngine;
 using UnhollowerBaseLib;
 using Object = UnityEngine.Object;
 
-namespace CustomCharacterLoader
+namespace CustomCharacterLoader.CharacterManager
 {
     public class CustomCharacter : UnityEngine.Object
     {
@@ -38,7 +38,7 @@ namespace CustomCharacterLoader
             public bool game_shaders { get; set; }
         }
 
-        // reads a json file then get the asset bundle and base_character
+        // Reads a json file then get the asset bundle and base_character
         public CustomCharacter(string characterName, string json, string dir)
         {
             CharacterTemp template = JsonSerializer.Deserialize<CharacterTemp>(json);
@@ -55,9 +55,18 @@ namespace CustomCharacterLoader
             this.assetName = template.asset_bundle;
             this.gameShaders = template.game_shaders;
 
-            // get asset bundle
+            // Get asset bundle
             Main.Output("Loading Character: " + this.charaName);
-            this.asset = AssetBundle.LoadFromFile(Path.Combine(dir, this.assetName));
+
+            try
+            {
+                this.asset = AssetBundle.LoadFromFile(Path.Combine(dir, this.assetName));
+            }
+            catch (Exception ex)
+            {
+                Main.Output("Unable to load file: " + Path.Combine(dir, this.assetName));
+            }
+
             if (this.asset == null)
             {
                 Main.Output("Cant find Asset bundle for " + dir + this.assetName);
@@ -66,21 +75,22 @@ namespace CustomCharacterLoader
             {
                 Main.Output("Loaded Asset Bundle: " + this.assetName);
 
-                // get sound files if any
+                // Get sound files if any
                 if (template.monkeeAcb != "")
                 {
-                    monkeeAcbPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Sounds\Monkeys\" + template.monkeeAcb + ".acb");
+                    monkeeAcbPath = Path.Combine(Main.PATH, @"Sounds\Monkeys\" + template.monkeeAcb + ".acb");
                 }
                 if (template.bananaAcb != "")
                 {
-                    bananaAcbPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Sounds\Bananas\" + template.bananaAcb + ".acb");
+                    bananaAcbPath = Path.Combine(Main.PATH, @"Sounds\Bananas\" + template.bananaAcb + ".acb");
                 }
             }
         }
 
+        // Create item data for character select screen
         public void CreateItemData(SelMgCharaItemDataListObject itemDataList)
         {
-            // Find the character the custom one is based on (for voice banks)
+            // Get CharaKind
             SelMgCharaItemData clone = itemDataList.m_ItemDataList[0];
             foreach (SelMgCharaItemData character in itemDataList.m_ItemDataList.list)
             {
@@ -91,14 +101,17 @@ namespace CustomCharacterLoader
                 }
             }
 
+            // Character Select Sprites
             this.icon = this.asset.LoadAsset<Sprite>("icon");
             this.banner = this.asset.LoadAsset<Sprite>("banner");
 
+            // Item Data class
             this.itemData = new SelMgCharaItemData();
             this.itemData.costumeIndex = 0;
             this.itemData.m_CharacterKind = clone.m_CharacterKind;
             this.itemData.m_CostumeList = new SelMgCharaItemData.CostumeList();
 
+            // Costume
             SelMgCharaItemData.CostumeData costume = new SelMgCharaItemData.CostumeData();
             costume.m_DisplayItemName = clone.costumeList[0].m_DisplayItemName;
             costume.m_PartsSetIndex = clone.costumeList[0].m_PartsSetIndex;
@@ -109,6 +122,7 @@ namespace CustomCharacterLoader
             costume._spritePicture_k__BackingField = this.banner;
             this.itemData.m_CostumeList.Add(costume);
 
+            // Item Data Cont..
             this.itemData.m_DescriptionText = clone.m_DescriptionText;
             this.itemData.m_IsHideText = clone.m_IsHideText;
             this.itemData.m_NarrationCueID = clone.m_NarrationCueID;
@@ -118,10 +132,9 @@ namespace CustomCharacterLoader
 
             itemDataList.m_ItemDataList.Add(this.itemData);
         }
-
         public void UpdateCharacterSelect()
         {
-            // Update Icons
+            // Update icons
             if (!this.icon)
             {
                 this.icon = this.asset.LoadAsset<Sprite>("icon");

@@ -1,22 +1,30 @@
 ﻿using System.Collections.Generic;
-using Flash2;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 using System.IO;
 using System;
 using UnhollowerRuntimeLib;
 using System.Reflection;
+using CustomCharacterLoader.CharacterManager;
+using CustomCharacterLoader.Patches;
+using CustomCharacterLoader.SoundManager;
+using CustomCharacterLoader.PlayerManager;
 
 namespace CustomCharacterLoader
 {
     public static class Main
     {
+        // File Paths
         public static string PATH = "";
+        public static string DYNAMIC_SOUNDS_PATH = "";
         public static string GUEST_CHARACTER_PATH = "";
-        private static string sceneName;
+
+        // Mod Objects
         public static CustomCharacterManager customCharacterManager = null;
-        private static MonkeyVoices monkeyVoices = null;
-            
+        public static PlayerLoader playerLoader = null;
+        public static SoundController soundController = null;
+
         // Console Text
         public static void Output(string text)
         {
@@ -33,16 +41,9 @@ namespace CustomCharacterLoader
         // Mod Start
         public static void OnModStart()
         {
-            PATH = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Characters\");
+            // Get Paths
+            PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            // create custom character manager
-            ClassInjector.RegisterTypeInIl2Cpp(typeof(CustomCharacterManager));
-            
-            var obj = new GameObject { hideFlags = HideFlags.HideAndDontSave };
-            Object.DontDestroyOnLoad(obj);
-            customCharacterManager = new CustomCharacterManager(obj.AddComponent(Il2CppType.Of<CustomCharacterManager>()).Pointer, PATH);
-
-            // Get Guest Character Pack assembly path
             Assembly assembly = Assembly.GetCallingAssembly();
             Type loader = assembly.GetType("BananaModManager.Loader.IL2Cpp.Loader");
             PropertyInfo infoList = loader.GetProperty("Mods");
@@ -50,87 +51,64 @@ namespace CustomCharacterLoader
             foreach (var mod in mods)
             {
                 string modName = mod.GetAssembly().ToString().Split(',')[0];
-                if (modName == "GuestCharacters")
+                if (modName == "Dynamic Sounds (Main Cast)")
                 {
-                    
+                    Main.DYNAMIC_SOUNDS_PATH = mod.Directory.ToString();
+                    Main.Output("Found Dynamic Sounds Path");
+                }
+                else if(modName == "GuestCharacters")
+                {
+                    Main.GUEST_CHARACTER_PATH = mod.Directory.ToString();
+                    Main.Output("Found Guest Characters Path");
                 }
             }
 
-            // Patches
-            Patches.MgCharaOnSubmitPatch.CreateDetour();
-            Patches.TaCharaOnSubmitPatch.CreateDetour();
+            // Create il2cpp objects
+            var obj = new GameObject { hideFlags = HideFlags.HideAndDontSave };
+            Object.DontDestroyOnLoad(obj);
+
+            ClassInjector.RegisterTypeInIl2Cpp(typeof(CustomCharacterManager));
+            Main.customCharacterManager = new CustomCharacterManager(obj.AddComponent(Il2CppType.Of<CustomCharacterManager>()).Pointer, Path.Combine(Main.PATH, "Characters\\"));
+
+            ClassInjector.RegisterTypeInIl2Cpp(typeof(PlayerLoader));
+            Main.playerLoader = new PlayerLoader(obj.AddComponent(Il2CppType.Of<PlayerLoader>()).Pointer);
+
+            ClassInjector.RegisterTypeInIl2Cpp(typeof(DummyController));
+            ClassInjector.RegisterTypeInIl2Cpp(typeof(UninvitedGuests));
+            ClassInjector.RegisterTypeInIl2Cpp(typeof(SoundController));
+            Main.soundController = new SoundController(obj.AddComponent(Il2CppType.Of<SoundController>()).Pointer);
+
+            // Create detours
+            CharaOnSubmitPatch.CreateMainGameDetour();
+            CharaOnSubmitPatch.CreateTimeAttackDetour();
+            CharaNamePatch.CreateMainGameDetour();
+            CharaNamePatch.CreateTimeAttackDetour();
+            MonkeyMutePatch.CreateDetour();
         }
 
-        // Mod Late Update (Split by scene names)
+        // Mod Update (Split by scene names)
+        public static string sceneName;
+        public static bool loadCharacter = false;
         public static void OnModUpdate()
         {
-            sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-
-            // Load Player Models when in Main Game
-            if (customCharacterManager.loadCharacter)
+            // Load character. scene names change per level... I don't care to keep track of all those names...
+            if (loadCharacter)
             {
-                customCharacterManager.LoadCustomCharacter();
-                if(monkeyVoices != null)
-                {
-                    monkeyVoices.LoadSounds(customCharacterManager.selectedCharacter);
-                }
+                Main.soundController.LoadSounds();
+                Main.playerLoader.LoadPlayer();
             }
 
-            // Scene = MainMenu
-            if (sceneName == "MainMenu")
+            Main.sceneName = SceneManager.GetActiveScene().name;
+            if (Main.sceneName == "MainMenu")
             {
-                customCharacterManager.loadCharacter = false;
-                // Import characters
-                if (!customCharacterManager.importedCharacters)
-                {
-                    // Create chara item data for character select
-                    SelMgCharaItemDataListObject[] charaDataListContainer = Resources.FindObjectsOfTypeAll<SelMgCharaItemDataListObject>();
-                    if (charaDataListContainer != null && charaDataListContainer.Length > 0)
-                    {
-                        customCharacterManager.ImportCharacters(charaDataListContainer[0]);
-
-                        // patch for name banner now that all the characters are loaded
-                        Patches.MgCharaNamePatch.CreateDetour();
-                        Patches.TaCharaNamePatch.CreateDetour();
-
-                        customCharacterManager.Update(); // make sure pictures stay
-                    }
-                }
-                // get costume manager 
-                else if(customCharacterManager.charaCustomizeManager == null)
-                {
-                    CharaCustomizeManager[] charaCustomizeContainer = Resources.FindObjectsOfTypeAll<CharaCustomizeManager>();
-                    if (charaCustomizeContainer != null && charaCustomizeContainer.Length > 0)
-                    {
-                        customCharacterManager.charaCustomizeManager = charaCustomizeContainer[0];
-                    }    
-                }
-                // After Characters are imported
-                else
-                {
-                    customCharacterManager.RevertChanges();
-                    customCharacterManager.Update(); // really make sure pictures stay
-                }
+                Main.loadCharacter = false;
+                Main.playerLoader.Load();
+                try { Main.customCharacterManager.Load(); }
+                catch (Exception) { } // The mode likes to throw unimportant errors when this method loads too fast.
             }
-            // Scene = MainGame
-            else if (sceneName == "MainGame")
+            else if (Main.sceneName == "MainGame")
             {
-                // Get the character data if custom character is selected
-                if (Patches.MgCharaOnSubmitPatch.isCustomCharacter || Patches.TaCharaOnSubmitPatch.isCustomCharacter)
-                {
-                    customCharacterManager.GetCustomCharacterSelected();
-                }
-            }
-        }
-
-        public static void OnModLateUpdate()
-        {
-            if (sceneName == "MainMenu")
-            {
-                if (customCharacterManager.importedCharacters)
-                {
-                    customCharacterManager.Update(); // really REALLY make sure pictures stay...
-                }
+                Main.loadCharacter = true;
             }
         }
     }
