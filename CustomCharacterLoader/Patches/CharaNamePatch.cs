@@ -20,9 +20,13 @@ namespace CustomCharacterLoader.Patches
             SelMgCharaSelectWindow _instance = new(_thisPtr);
 
             int charaIconId = selectedChara.costumeList[0].spriteIcon.GetInstanceID();
-            if (Main.customCharacterManager.BannerDict.ContainsKey(charaIconId))
+            foreach(CharacterManager.CustomCharacter character in Main.customCharacterManager.characters)
             {
-                _instance.themeBeltView.SetCharacterName(Main.customCharacterManager.BannerDict[charaIconId]);
+                if(character.icon.GetInstanceID() == charaIconId)
+                {
+                    _instance.themeBeltView.SetCharacterName(character.charaName);
+                    break;
+                }    
             }
         }
 

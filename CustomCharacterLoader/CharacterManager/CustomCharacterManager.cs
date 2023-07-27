@@ -15,12 +15,8 @@ namespace CustomCharacterLoader.CharacterManager
     public class CustomCharacterManager : MonoBehaviour
     {
         // Lists of character stuff
-        public Dictionary<int, string> BannerDict = new Dictionary<int, string>();
         public List<CustomCharacter> characters = new List<CustomCharacter>();
 
-        // Force character import
-        public static bool importedCharacters = false;
-        
         public CustomCharacterManager() { }
         public CustomCharacterManager(IntPtr ptr) : base(ptr) { }
         public CustomCharacterManager(IntPtr ptr, string path) : base(ptr)
@@ -29,7 +25,7 @@ namespace CustomCharacterLoader.CharacterManager
             foreach (string dir in Directory.GetDirectories(path))
             {
                 Console.WriteLine(dir);
-                // Reads all the Json files in folder
+                // Reads all the Json files in folders
                 foreach (string json in Directory.GetFiles(dir, "*.json"))
                 {
                     StreamReader reader = new StreamReader(json);
@@ -47,17 +43,17 @@ namespace CustomCharacterLoader.CharacterManager
         }
 
         // Create character select icons for all custom characters
+        public static bool importedCharacters = false;
         public void Load()
         {
             if (!importedCharacters)
             {
-                SelMgCharaItemDataListObject[] gameCharacterList = Resources.FindObjectsOfTypeAll<SelMgCharaItemDataListObject>();
+                SelMgCharaItemDataListObject[] gameCharacterList = Resources.FindObjectsOfTypeAll<SelMgCharaItemDataListObject>(); // character select page
                 if (gameCharacterList != null && gameCharacterList.Length > 0)
                 {
                     foreach (CustomCharacter chara in characters)
                     {
                         chara.CreateItemData(gameCharacterList[0]);
-                        BannerDict.Add(chara.icon.GetInstanceID(), chara.charaName);
                     }
                     Main.Output("Created Custom Character Slots.");
                     importedCharacters = true;
@@ -73,31 +69,6 @@ namespace CustomCharacterLoader.CharacterManager
             {
                 chara.UpdateCharacterSelect();
             }
-        }
-        
-        // Replace ingame model
-        public static GameObject ReplaceModel(CustomCharacter selectedCharacter)
-        {
-            GameObject customPlayerObject = null;
-            Il2CppArrayBase<Monkey> monkey = Resources.FindObjectsOfTypeAll<Monkey>();
-            if (monkey.Length > 1)
-            {
-                GameObject playerObject = monkey[0].gameObject;
-
-                GameObject target_model = playerObject.GetComponentInChildren<Animator>().gameObject;
-                Shader shader = playerObject.GetComponentInChildren<SkinnedMeshRenderer>().material.shader;
-                customPlayerObject = selectedCharacter.InitializeCharacter(shader);
-
-                foreach (var component in playerObject.GetComponentsInChildren<SkinnedMeshRenderer>())
-                {
-                    component.enabled = false;
-                }
-
-                customPlayerObject.transform.parent = target_model.transform;
-                playerObject.GetComponent<MonkeyRef>().m_Animator = customPlayerObject.GetComponentInChildren<Animator>();
-                playerObject.GetComponent<Monkey>().m_Animator = customPlayerObject.GetComponentInChildren<Animator>();
-            }
-            return customPlayerObject;
         }
     }
 }

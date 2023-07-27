@@ -18,7 +18,7 @@ namespace CustomCharacterLoader.SoundManager
         }
     }
 
-    // Guest Characters Sound Controller modified so every monkey is in the guest[] and some additional code to mix and match for custom character sounds.
+    // Guest Characters Sound Controller modified so every monkey is in the guest[]
     public class UninvitedGuests : Guest.GuestCharacters
     {
         public string[] _realGuestArray;

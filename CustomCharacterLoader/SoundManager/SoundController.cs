@@ -36,7 +36,7 @@ namespace CustomCharacterLoader.SoundManager
                 load = false;
             }
 
-            // Replace with dummy controller
+            // Replace DynamicsSounds player sounds with dummy controller
             if (load2 & DynamicSounds.Main._dynamicRoll != null)
             {
                 Object.Destroy(DynamicSounds.Main._dynamicRoll);

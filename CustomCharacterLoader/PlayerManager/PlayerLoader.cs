@@ -9,6 +9,7 @@ using UnityEngine;
 using UnhollowerRuntimeLib;
 using Object = UnityEngine.Object;
 using CustomCharacterLoader.CharacterManager;
+using UnhollowerBaseLib;
 
 namespace CustomCharacterLoader.PlayerManager
 {
@@ -105,9 +106,40 @@ namespace CustomCharacterLoader.PlayerManager
                     Main.soundController.load = true;
                     Main.soundController.load2 = true;
                     RemoveCosmetics();
-                    customPlayerObject = CustomCharacterManager.ReplaceModel(selectedCharacter);
+                    customPlayerObject = ReplaceModel(selectedCharacter);
                 }
             }
+        }
+
+        // Replace ingame model
+        public static GameObject ReplaceModel(CustomCharacter selectedCharacter)
+        {
+            GameObject customPlayerObject = null;
+            Il2CppArrayBase<Monkey> monkey = Resources.FindObjectsOfTypeAll<Monkey>();
+            if (monkey.Length > 1)
+            {
+                // get ingame stuff
+                GameObject playerObject = monkey[0].gameObject;
+                GameObject target_model = playerObject.GetComponentInChildren<Animator>().gameObject;
+                Shader shader = playerObject.GetComponentInChildren<SkinnedMeshRenderer>().material.shader;
+
+                // make base character model invisible
+                foreach (var component in playerObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+                {
+                    Console.WriteLine(component.name + ": " + component.transform.rotation);
+                    component.enabled = false;
+                }
+
+                // load custom character
+                customPlayerObject = selectedCharacter.InitializeCharacter(shader);
+                Quaternion rotation = playerObject.transform.rotation;
+                playerObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+                customPlayerObject.transform.parent = target_model.transform;
+                playerObject.GetComponent<MonkeyRef>().m_Animator = customPlayerObject.GetComponentInChildren<Animator>();
+                playerObject.GetComponent<Monkey>().m_Animator = customPlayerObject.GetComponentInChildren<Animator>();
+                playerObject.transform.rotation = rotation;
+            }
+            return customPlayerObject;
         }
     }
 }

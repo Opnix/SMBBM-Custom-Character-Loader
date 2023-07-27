@@ -15,10 +15,7 @@ A mod made for Super Monkey Ball: Banana Mania. This mod adds the ability to add
 - Import custom asset bundles into the game containing 3d meshes and animations
 - Add custom characters to character select screen (without replacing)
 - Import the custom character assets into the main game
-- Load Custom Character Voices using Dynamic Sounds & Guest Character Voice Pack
 
 ### Yet to be Implemented Features:
 - Import custom banana assets into the game
 - Import custom Pause icon
-- Custom Balls
-- Enable Custom Balls for all characters

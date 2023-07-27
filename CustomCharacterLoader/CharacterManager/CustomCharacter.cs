@@ -13,7 +13,9 @@ namespace CustomCharacterLoader.CharacterManager
     {
         public string charaName = "";
         private string assetName = "";
-        private string voiceBank = "";
+        private string base_monkey = "Aiai";
+        public string monkeeAcbPath = "";
+        public string bananaAcbPath = "";
         private bool gameShaders = false;
 
         // Super Monkey Ball Objects
@@ -23,11 +25,7 @@ namespace CustomCharacterLoader.CharacterManager
         public AssetBundle asset;
         public Sprite icon;
         public Sprite banner;
-        public Sprite pause;
-
-        // Sound Files
-        public string monkeeAcbPath = "";
-        public string bananaAcbPath = "";
+        public Sprite pause;        
 
         private class CharacterTemp
         {
@@ -42,13 +40,9 @@ namespace CustomCharacterLoader.CharacterManager
         public CustomCharacter(string characterName, string json, string dir)
         {
             CharacterTemp template = JsonSerializer.Deserialize<CharacterTemp>(json);
-            if (template.base_monkey == "")
+            if (template.base_monkey != "")
             {
-                this.voiceBank = "Aiai";
-            }
-            else
-            {
-                this.voiceBank = template.base_monkey;
+                this.base_monkey = template.base_monkey;
             }
 
             this.charaName = characterName;
@@ -56,10 +50,9 @@ namespace CustomCharacterLoader.CharacterManager
             this.gameShaders = template.game_shaders;
 
             // Get asset bundle
-            Main.Output("Loading Character: " + this.charaName);
-
             try
             {
+                Main.Output("Loading Character: " + this.charaName);
                 this.asset = AssetBundle.LoadFromFile(Path.Combine(dir, this.assetName));
             }
             catch (Exception ex)
@@ -69,7 +62,7 @@ namespace CustomCharacterLoader.CharacterManager
 
             if (this.asset == null)
             {
-                Main.Output("Cant find Asset bundle for " + dir + this.assetName);
+                Main.Output("Cant find Asset bundle:" + dir + this.assetName);
             }
             else
             {
@@ -94,7 +87,7 @@ namespace CustomCharacterLoader.CharacterManager
             SelMgCharaItemData clone = itemDataList.m_ItemDataList[0];
             foreach (SelMgCharaItemData character in itemDataList.m_ItemDataList.list)
             {
-                if (character.characterKind.ToString().ToLower() == this.voiceBank)
+                if (character.characterKind.ToString().ToLower() == this.base_monkey)
                 {
                     clone = character;
                     break;
@@ -150,8 +143,9 @@ namespace CustomCharacterLoader.CharacterManager
         public GameObject InitializeCharacter(Shader shader)
         {
             GameObject modModel = Object.Instantiate(this.asset.LoadAsset<GameObject>("character"));
-            Il2CppReferenceArray<Material> materials = modModel.GetComponentInChildren<SkinnedMeshRenderer>().materials;
 
+            // if game shaders is true
+            Il2CppReferenceArray<Material> materials = modModel.GetComponentInChildren<SkinnedMeshRenderer>().materials;
             if (this.gameShaders)
             {
                 foreach (Material material in materials)
