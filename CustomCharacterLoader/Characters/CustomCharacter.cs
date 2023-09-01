@@ -157,13 +157,17 @@ namespace CustomCharacterLoader.CharacterManager
                 {
                     foreach (Material material in meshRenderer.materials)
                     {
-                        if (material.name.Contains("Eye"))
+                        if (!material.name.Contains("balls") && !material.name.Contains("Eye"))
+                        {
+                            material.shader = shader;
+                        }
+                        else if (material.name.Contains("Eye"))
                         {
                             material.shader = eyeShader;
                         }
                         else
                         {
-                            material.shader = shader;
+                            // do nothing adachi_true :)
                         }
                     }
                 }

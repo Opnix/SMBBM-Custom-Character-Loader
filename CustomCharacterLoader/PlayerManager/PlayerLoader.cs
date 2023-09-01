@@ -11,6 +11,7 @@ using Object = UnityEngine.Object;
 using CustomCharacterLoader.CharacterManager;
 using UnhollowerBaseLib;
 using Il2CppSystem.Reflection;
+using BananaModManager.Shared;
 
 namespace CustomCharacterLoader.PlayerManager
 {
@@ -97,23 +98,21 @@ namespace CustomCharacterLoader.PlayerManager
         }
 
         // Insert character into the game
-        public void LoadPlayer()
+        public void LoadPlayer(AssetBundle AssetBundle)
         {
             if (playerType == CharacterType.Character)
             {
                 // Look for player object
                 if (customPlayerObject == null)
                 {
-                    Main.soundController.load = true;
-                    Main.soundController.load2 = true;
                     RemoveCosmetics();
-                    customPlayerObject = ReplaceModel(selectedCharacter);
+                    customPlayerObject = ReplaceModel(selectedCharacter, AssetBundle);
                 }
             }
         }
 
         // Replace ingame model
-        public static GameObject ReplaceModel(CustomCharacter selectedCharacter)
+        public static GameObject ReplaceModel(CustomCharacter selectedCharacter, AssetBundle assetbundle)
         {
             GameObject customPlayerObject = null;
             Il2CppArrayBase<Player> players = Resources.FindObjectsOfTypeAll<Player>(); // FUTURE ME, THIS DONT WORK WITH MULTIPLE PLAYERS
@@ -121,20 +120,12 @@ namespace CustomCharacterLoader.PlayerManager
             {
                 GameObject playerContainer = players[0].m_Monkey.gameObject;
                 GameObject target_model = playerContainer.GetComponentInChildren<Animator>().gameObject;
-                Shader shader = playerContainer.GetComponentInChildren<SkinnedMeshRenderer>().material.shader;
-                Shader eyeShader = shader;
+                Shader shader = assetbundle.LoadAsset<Shader>("assets/eatass2.shader");
+				Shader eyeShader = assetbundle.LoadAsset<Shader>("assets/eyeass.shader");
 
-                // make base character model invisible
-                foreach (var component in playerContainer.GetComponentsInChildren<SkinnedMeshRenderer>())
+				// make base character model invisible
+				foreach (var component in playerContainer.GetComponentsInChildren<SkinnedMeshRenderer>())
                 {
-                    if (component.material.shader.name == "Custom/ToonRimPt")
-                    {
-                        eyeShader = component.material.shader;
-                    }
-                    else
-                    {
-                        shader = component.material.shader;
-                    }
                     component.enabled = false;
                 }
 
@@ -150,5 +141,5 @@ namespace CustomCharacterLoader.PlayerManager
             }
             return customPlayerObject;
         }
-    }
+	}
 }

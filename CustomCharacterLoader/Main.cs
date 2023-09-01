@@ -8,7 +8,6 @@ using UnhollowerRuntimeLib;
 using System.Reflection;
 using CustomCharacterLoader.CharacterManager;
 using CustomCharacterLoader.Patches;
-using CustomCharacterLoader.SoundManager;
 using CustomCharacterLoader.PlayerManager;
 
 namespace CustomCharacterLoader
@@ -23,26 +22,58 @@ namespace CustomCharacterLoader
         // Mod Objects
         public static CustomCharacterList customCharacterManager = null;
         public static PlayerLoader playerLoader = null;
-        public static SoundController soundController = null;
 
-        // Console Text
-        public static void Output(string text)
+		// Asset Bundle
+		private static AssetBundle assetBundle;
+		public static Shader CustomShader { get; private set; }
+
+		// Console Text
+		public static void Output(string text)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("CustomCharacterLoader: " + text);
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        // Mod Load
-        public static void OnModLoad(Dictionary<string, object> settings)
-        {
-        }
+		// Mod Load
+		// Mod Load
+		public static void OnModLoad(Dictionary<string, object> settings)
+		{
+		}
 
-        // Mod Start
-        public static void OnModStart()
+		private static void LoadAssetBundle()
+		{
+			if (assetBundle == null)
+			{
+				Output("Loading AssetBundle...");
+				string assemblyLocation = Assembly.GetExecutingAssembly().Location;
+				string DLLFolder = Path.GetDirectoryName(assemblyLocation);
+				string assetBundlePath = Path.Combine(DLLFolder, "sbmshader");
+                Output("AssetBundle path: " + assetBundlePath);
+				assetBundle = AssetBundle.LoadFromFile(assetBundlePath);
+
+				if (assetBundle != null)
+				{
+					Output("AssetBundle loaded successfully.");
+				}
+				else
+				{
+					Output("Failed to load AssetBundle.");
+				}
+			}
+			else
+			{
+				Output("AssetBundle already loaded.");
+			}
+		}
+
+
+
+		// Mod Start
+		public static void OnModStart()
         {
-            // Get Paths
-            PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			// Get Paths
+			PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             Assembly assembly = Assembly.GetCallingAssembly();
             Type loader = assembly.GetType("BananaModManager.Loader.IL2Cpp.Loader");
@@ -73,11 +104,6 @@ namespace CustomCharacterLoader
             ClassInjector.RegisterTypeInIl2Cpp(typeof(PlayerLoader));
             Main.playerLoader = new PlayerLoader(obj.AddComponent(Il2CppType.Of<PlayerLoader>()).Pointer);
 
-            ClassInjector.RegisterTypeInIl2Cpp(typeof(DummyController));
-            ClassInjector.RegisterTypeInIl2Cpp(typeof(UninvitedGuests));
-            ClassInjector.RegisterTypeInIl2Cpp(typeof(SoundController));
-            Main.soundController = new SoundController(obj.AddComponent(Il2CppType.Of<SoundController>()).Pointer);
-
             // Create detours
             CharaOnSubmitPatch.CreateMainGameDetour();
             CharaOnSubmitPatch.CreateTimeAttackDetour();
@@ -91,11 +117,11 @@ namespace CustomCharacterLoader
         public static bool loadCharacter = false;
         public static void OnModUpdate()
         {
-            // Load character. scene names change per level... I don't care to keep track of all those names...
-            if (loadCharacter)
+			// Load character. scene names change per level... I don't care to keep track of all those names...
+			LoadAssetBundle();
+			if (loadCharacter)
             {
-                Main.soundController.LoadSounds();
-                Main.playerLoader.LoadPlayer();
+                Main.playerLoader.LoadPlayer(assetBundle);
             }
 
             Main.sceneName = SceneManager.GetActiveScene().name;
