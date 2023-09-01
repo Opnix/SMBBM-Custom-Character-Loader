@@ -104,8 +104,6 @@ namespace CustomCharacterLoader.PlayerManager
                 // Look for player object
                 if (customPlayerObject == null)
                 {
-                    Main.soundController.load = true;
-                    Main.soundController.load2 = true;
                     RemoveCosmetics();
                     customPlayerObject = ReplaceModel(selectedCharacter);
                 }

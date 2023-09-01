@@ -27,12 +27,6 @@
     <Reference Include="BananaModManager.Shared">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\BananaModManager.Shared.dll</HintPath>
     </Reference>
-    <Reference Include="Dynamic Sounds %28Main Cast%29">
-      <HintPath>..\..\..\..\..\..\..\SteamLibrary\steamapps\common\smbbm_w\output\2\DynamicSounds.dll</HintPath>
-    </Reference>
-    <Reference Include="GuestCharacters">
-      <HintPath>W:\Desktop\Guest Characters Only\bin\Debug\GuestCharacters.dll</HintPath>
-    </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Il2Cppmscorlib.dll</HintPath>
     </Reference>
@@ -40,7 +34,7 @@
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Il2CppSystem.dll</HintPath>
     </Reference>
     <Reference Include="Il2CppSystem.Core">
-      <HintPath>..\..\..\..\..\..\..\SteamLibrary\steamapps\common\smbbm\managed\Il2CppSystem.Core.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Il2CppSystem.Core.dll</HintPath>
     </Reference>
     <Reference Include="UnhollowerBaseLib">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnhollowerBaseLib.dll</HintPath>
@@ -52,16 +46,13 @@
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>..\..\..\..\..\..\..\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.VideoModule">
-      <HintPath>..\..\..\..\..\..\..\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.VideoModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 

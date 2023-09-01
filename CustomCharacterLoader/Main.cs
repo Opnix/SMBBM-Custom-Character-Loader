@@ -8,7 +8,6 @@ using UnhollowerRuntimeLib;
 using System.Reflection;
 using CustomCharacterLoader.CharacterManager;
 using CustomCharacterLoader.Patches;
-using CustomCharacterLoader.SoundManager;
 using CustomCharacterLoader.PlayerManager;
 
 namespace CustomCharacterLoader
@@ -23,7 +22,6 @@ namespace CustomCharacterLoader
         // Mod Objects
         public static CustomCharacterList customCharacterManager = null;
         public static PlayerLoader playerLoader = null;
-        public static SoundController soundController = null;
 
         // Console Text
         public static void Output(string text)
@@ -73,11 +71,6 @@ namespace CustomCharacterLoader
             ClassInjector.RegisterTypeInIl2Cpp(typeof(PlayerLoader));
             Main.playerLoader = new PlayerLoader(obj.AddComponent(Il2CppType.Of<PlayerLoader>()).Pointer);
 
-            ClassInjector.RegisterTypeInIl2Cpp(typeof(DummyController));
-            ClassInjector.RegisterTypeInIl2Cpp(typeof(UninvitedGuests));
-            ClassInjector.RegisterTypeInIl2Cpp(typeof(SoundController));
-            Main.soundController = new SoundController(obj.AddComponent(Il2CppType.Of<SoundController>()).Pointer);
-
             // Create detours
             CharaOnSubmitPatch.CreateMainGameDetour();
             CharaOnSubmitPatch.CreateTimeAttackDetour();
@@ -94,7 +87,6 @@ namespace CustomCharacterLoader
             // Load character. scene names change per level... I don't care to keep track of all those names...
             if (loadCharacter)
             {
-                Main.soundController.LoadSounds();
                 Main.playerLoader.LoadPlayer();
             }
 
