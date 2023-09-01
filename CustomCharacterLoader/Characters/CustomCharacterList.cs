@@ -12,16 +12,16 @@ using UnhollowerRuntimeLib;
 
 namespace CustomCharacterLoader.CharacterManager
 {
-    public class CustomCharacterManager : MonoBehaviour
+    public class CustomCharacterList : MonoBehaviour
     {
         // Lists of character stuff
         public List<CustomCharacter> characters = new List<CustomCharacter>();
 
-        public CustomCharacterManager() { }
-        public CustomCharacterManager(IntPtr ptr) : base(ptr) { }
-        public CustomCharacterManager(IntPtr ptr, string path) : base(ptr)
+        public CustomCharacterList() { }
+        public CustomCharacterList(IntPtr ptr) : base(ptr) { }
+        public CustomCharacterList(IntPtr ptr, string path) : base(ptr)
         {
-            // Go to each folder in Character folder
+            // Read the Characters folder
             foreach (string dir in Directory.GetDirectories(path))
             {
                 Console.WriteLine(dir);

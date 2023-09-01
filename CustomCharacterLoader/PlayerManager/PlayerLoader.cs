@@ -10,6 +10,7 @@ using UnhollowerRuntimeLib;
 using Object = UnityEngine.Object;
 using CustomCharacterLoader.CharacterManager;
 using UnhollowerBaseLib;
+using Il2CppSystem.Reflection;
 
 namespace CustomCharacterLoader.PlayerManager
 {
@@ -115,29 +116,37 @@ namespace CustomCharacterLoader.PlayerManager
         public static GameObject ReplaceModel(CustomCharacter selectedCharacter)
         {
             GameObject customPlayerObject = null;
-            Il2CppArrayBase<Monkey> monkey = Resources.FindObjectsOfTypeAll<Monkey>();
-            if (monkey.Length > 1)
+            Il2CppArrayBase<Player> players = Resources.FindObjectsOfTypeAll<Player>(); // FUTURE ME, THIS DONT WORK WITH MULTIPLE PLAYERS
+            if (players.Length > 1)
             {
-                // get ingame stuff
-                GameObject playerObject = monkey[0].gameObject;
-                GameObject target_model = playerObject.GetComponentInChildren<Animator>().gameObject;
-                Shader shader = playerObject.GetComponentInChildren<SkinnedMeshRenderer>().material.shader;
+                GameObject playerContainer = players[0].m_Monkey.gameObject;
+                GameObject target_model = playerContainer.GetComponentInChildren<Animator>().gameObject;
+                Shader shader = playerContainer.GetComponentInChildren<SkinnedMeshRenderer>().material.shader;
+                Shader eyeShader = shader;
 
                 // make base character model invisible
-                foreach (var component in playerObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+                foreach (var component in playerContainer.GetComponentsInChildren<SkinnedMeshRenderer>())
                 {
-                    Console.WriteLine(component.name + ": " + component.transform.rotation);
+                    if (component.material.shader.name == "Custom/ToonRimPt")
+                    {
+                        eyeShader = component.material.shader;
+                    }
+                    else
+                    {
+                        shader = component.material.shader;
+                    }
                     component.enabled = false;
                 }
 
                 // load custom character
-                customPlayerObject = selectedCharacter.InitializeCharacter(shader);
-                Quaternion rotation = playerObject.transform.rotation;
-                playerObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+                customPlayerObject = selectedCharacter.InitializeCharacter(shader, eyeShader);
+                Quaternion rotation = playerContainer.transform.rotation;
+                playerContainer.transform.rotation = Quaternion.Euler(0, 0, 0);
                 customPlayerObject.transform.parent = target_model.transform;
-                playerObject.GetComponent<MonkeyRef>().m_Animator = customPlayerObject.GetComponentInChildren<Animator>();
-                playerObject.GetComponent<Monkey>().m_Animator = customPlayerObject.GetComponentInChildren<Animator>();
-                playerObject.transform.rotation = rotation;
+                Animator customAnimator = customPlayerObject.GetComponentInChildren<Animator>();
+                playerContainer.GetComponent<MonkeyRef>().m_Animator = customAnimator;
+                playerContainer.GetComponent<Monkey>().m_Animator = customAnimator;
+                playerContainer.transform.rotation = rotation;
             }
             return customPlayerObject;
         }

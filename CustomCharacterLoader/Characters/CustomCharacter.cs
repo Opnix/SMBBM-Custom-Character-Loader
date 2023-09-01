@@ -12,11 +12,11 @@ namespace CustomCharacterLoader.CharacterManager
     public class CustomCharacter : UnityEngine.Object
     {
         public string charaName = "";
-        private string assetName = "";
-        private string base_monkey = "Aiai";
+        public string assetName = "";
+        public string base_monkey = "Aiai";
         public string monkeeAcbPath = "";
         public string bananaAcbPath = "";
-        private bool gameShaders = false;
+        public bool shader = true;
 
         // Super Monkey Ball Objects
         public SelMgCharaItemData itemData;
@@ -25,31 +25,35 @@ namespace CustomCharacterLoader.CharacterManager
         public AssetBundle asset;
         public Sprite icon;
         public Sprite banner;
-        public Sprite pause;        
+        public Sprite pause; // NOT IMPLEMENTED
 
-        private class CharacterTemp
+        private class CharacterJsonTemplate
         {
             public string asset_bundle { get; set; }
             public string base_monkey { get; set; }
             public string monkeeAcb { get; set; }
             public string bananaAcb { get; set; }
-            public bool game_shaders { get; set; }
+            public bool shader { get; set; } = true;
         }
 
         // Reads a json file then get the asset bundle and base_character
         public CustomCharacter(string characterName, string json, string dir)
         {
-            CharacterTemp template = JsonSerializer.Deserialize<CharacterTemp>(json);
-            if (template.base_monkey != "")
+            // get base monkey
+            CharacterJsonTemplate template = JsonSerializer.Deserialize<CharacterJsonTemplate>(json);
+            if(template.base_monkey != null)
             {
-                this.base_monkey = template.base_monkey;
+                if (Enum.IsDefined(typeof(Chara.eKind), template.base_monkey))
+                {
+                    this.base_monkey = template.base_monkey;
+                }
             }
 
             this.charaName = characterName;
             this.assetName = template.asset_bundle;
-            this.gameShaders = template.game_shaders;
+            this.shader = template.shader;
 
-            // Get asset bundle
+            // Open asset bundle
             try
             {
                 Main.Output("Loading Character: " + this.charaName);
@@ -60,6 +64,7 @@ namespace CustomCharacterLoader.CharacterManager
                 Main.Output("Unable to load file: " + Path.Combine(dir, this.assetName));
             }
 
+            // Check if asset bundle loaded
             if (this.asset == null)
             {
                 Main.Output("Cant find Asset bundle:" + dir + this.assetName);
@@ -140,20 +145,29 @@ namespace CustomCharacterLoader.CharacterManager
             this.itemData.costumeList[0].spriteIcon = this.icon;
         }
 
-        public GameObject InitializeCharacter(Shader shader)
+        public GameObject InitializeCharacter(Shader shader, Shader eyeShader)
         {
             GameObject modModel = Object.Instantiate(this.asset.LoadAsset<GameObject>("character"));
 
-            // if game shaders is true
-            Il2CppReferenceArray<Material> materials = modModel.GetComponentInChildren<SkinnedMeshRenderer>().materials;
-            if (this.gameShaders)
+            // set shaders
+            if (this.shader == true)
             {
-                foreach (Material material in materials)
+                Il2CppArrayBase<SkinnedMeshRenderer> MeshRenderers = modModel.GetComponentsInChildren<SkinnedMeshRenderer>();
+                foreach (SkinnedMeshRenderer meshRenderer in MeshRenderers)
                 {
-                    material.shader = shader;
+                    foreach (Material material in meshRenderer.materials)
+                    {
+                        if (material.name.Contains("Eye"))
+                        {
+                            material.shader = eyeShader;
+                        }
+                        else
+                        {
+                            material.shader = shader;
+                        }
+                    }
                 }
             }
-
             modModel.SetActive(true);
             return modModel;
         }

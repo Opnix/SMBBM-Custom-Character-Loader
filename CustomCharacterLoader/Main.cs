@@ -21,7 +21,7 @@ namespace CustomCharacterLoader
         public static string GUEST_CHARACTER_PATH = "";
 
         // Mod Objects
-        public static CustomCharacterManager customCharacterManager = null;
+        public static CustomCharacterList customCharacterManager = null;
         public static PlayerLoader playerLoader = null;
         public static SoundController soundController = null;
 
@@ -67,8 +67,8 @@ namespace CustomCharacterLoader
             var obj = new GameObject { hideFlags = HideFlags.HideAndDontSave };
             Object.DontDestroyOnLoad(obj);
 
-            ClassInjector.RegisterTypeInIl2Cpp(typeof(CustomCharacterManager));
-            Main.customCharacterManager = new CustomCharacterManager(obj.AddComponent(Il2CppType.Of<CustomCharacterManager>()).Pointer, Path.Combine(Main.PATH, "Characters\\"));
+            ClassInjector.RegisterTypeInIl2Cpp(typeof(CustomCharacterList));
+            Main.customCharacterManager = new CustomCharacterList(obj.AddComponent(Il2CppType.Of<CustomCharacterList>()).Pointer, Path.Combine(Main.PATH, "Characters\\"));
 
             ClassInjector.RegisterTypeInIl2Cpp(typeof(PlayerLoader));
             Main.playerLoader = new PlayerLoader(obj.AddComponent(Il2CppType.Of<PlayerLoader>()).Pointer);

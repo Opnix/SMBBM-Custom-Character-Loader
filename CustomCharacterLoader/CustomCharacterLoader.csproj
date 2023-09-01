@@ -39,6 +39,9 @@
     <Reference Include="Il2CppSystem">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\Il2CppSystem.dll</HintPath>
     </Reference>
+    <Reference Include="Il2CppSystem.Core">
+      <HintPath>..\..\..\..\..\..\..\SteamLibrary\steamapps\common\smbbm\managed\Il2CppSystem.Core.dll</HintPath>
+    </Reference>
     <Reference Include="UnhollowerBaseLib">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnhollowerBaseLib.dll</HintPath>
     </Reference>
@@ -49,13 +52,16 @@
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VideoModule">
+      <HintPath>..\..\..\..\..\..\..\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.VideoModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 
