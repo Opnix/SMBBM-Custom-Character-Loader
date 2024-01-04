@@ -63,7 +63,6 @@ namespace CustomCharacterLoader
 			}
 			else
 			{
-				Output("AssetBundle already loaded.");
 			}
 		}
 
