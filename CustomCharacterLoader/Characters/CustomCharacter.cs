@@ -13,10 +13,7 @@ namespace CustomCharacterLoader.CharacterManager
     {
         public string charaName = "";
         public string assetName = "";
-        public string base_monkey = "Aiai";
-        public string monkeeAcbPath = "";
-        public string bananaAcbPath = "";
-        public bool shader = true;
+        public string base_monkey = "jam";
 
         // Super Monkey Ball Objects
         public SelMgCharaItemData itemData;
@@ -30,28 +27,23 @@ namespace CustomCharacterLoader.CharacterManager
         private class CharacterJsonTemplate
         {
             public string asset_bundle { get; set; }
-            public string base_monkey { get; set; }
-            public string monkeeAcb { get; set; }
-            public string bananaAcb { get; set; }
-            public bool shader { get; set; } = true;
+            public string base_monkey { get; set; } = "jam";
         }
 
         // Reads a json file then get the asset bundle and base_character
         public CustomCharacter(string characterName, string json, string dir)
         {
-            // get base monkey
             CharacterJsonTemplate template = JsonSerializer.Deserialize<CharacterJsonTemplate>(json);
-            if(template.base_monkey != null)
+
+            template.base_monkey = template.base_monkey.ToLower();
+            String[] charakind = Array.ConvertAll(Enum.GetNames(typeof(Chara.eKind)), chara => chara.ToString().ToLower());
+            if (Array.Exists(charakind, chara => chara == template.base_monkey))
             {
-                if (Enum.IsDefined(typeof(Chara.eKind), template.base_monkey))
-                {
-                    this.base_monkey = template.base_monkey;
-                }
+                this.base_monkey = template.base_monkey;
             }
 
             this.charaName = characterName;
             this.assetName = template.asset_bundle;
-            this.shader = template.shader;
 
             // Open asset bundle
             try
@@ -72,16 +64,6 @@ namespace CustomCharacterLoader.CharacterManager
             else
             {
                 Main.Output("Loaded Asset Bundle: " + this.assetName);
-
-                // Get sound files if any
-                if (template.monkeeAcb != "")
-                {
-                    monkeeAcbPath = Path.Combine(Main.PATH, @"Sounds\Monkeys\" + template.monkeeAcb + ".acb");
-                }
-                if (template.bananaAcb != "")
-                {
-                    bananaAcbPath = Path.Combine(Main.PATH, @"Sounds\Bananas\" + template.bananaAcb + ".acb");
-                }
             }
         }
 
@@ -150,28 +132,26 @@ namespace CustomCharacterLoader.CharacterManager
             GameObject modModel = Object.Instantiate(this.asset.LoadAsset<GameObject>("character"));
 
             // set shaders
-            if (this.shader == true)
+            Il2CppArrayBase<SkinnedMeshRenderer> MeshRenderers = modModel.GetComponentsInChildren<SkinnedMeshRenderer>();
+            foreach (SkinnedMeshRenderer meshRenderer in MeshRenderers)
             {
-                Il2CppArrayBase<SkinnedMeshRenderer> MeshRenderers = modModel.GetComponentsInChildren<SkinnedMeshRenderer>();
-                foreach (SkinnedMeshRenderer meshRenderer in MeshRenderers)
+                foreach (Material material in meshRenderer.materials)
                 {
-                    foreach (Material material in meshRenderer.materials)
+                    if (!material.name.Contains("balls") && !material.name.Contains("Eye"))
                     {
-                        if (!material.name.Contains("balls") && !material.name.Contains("Eye"))
-                        {
-                            material.shader = shader;
-                        }
-                        else if (material.name.Contains("Eye"))
-                        {
-                            material.shader = eyeShader;
-                        }
-                        else
-                        {
-                            // do nothing adachi_true :)
-                        }
+                        material.shader = shader;
+                    }
+                    else if (material.name.Contains("Eye"))
+                    {
+                        material.shader = eyeShader;
+                    }
+                    else
+                    {
+                        // do nothing adachi_true :)
                     }
                 }
             }
+            
             modModel.SetActive(true);
             return modModel;
         }

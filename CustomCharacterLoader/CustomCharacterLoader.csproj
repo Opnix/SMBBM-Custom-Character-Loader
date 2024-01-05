@@ -11,6 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dependencies\**" />
+    <EmbeddedResource Remove="Dependencies\**" />
+    <None Remove="Dependencies\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="7.0.0" />
   </ItemGroup>
 

@@ -16,8 +16,6 @@ namespace CustomCharacterLoader
     {
         // File Paths
         public static string PATH = "";
-        public static string DYNAMIC_SOUNDS_PATH = "";
-        public static string GUEST_CHARACTER_PATH = "";
 
         // Mod Objects
         public static CustomCharacterList customCharacterManager = null;
@@ -36,7 +34,6 @@ namespace CustomCharacterLoader
         }
 
 		// Mod Load
-		// Mod Load
 		public static void OnModLoad(Dictionary<string, object> settings)
 		{
 		}
@@ -46,9 +43,7 @@ namespace CustomCharacterLoader
 			if (assetBundle == null)
 			{
 				Output("Loading AssetBundle...");
-				string assemblyLocation = Assembly.GetExecutingAssembly().Location;
-				string DLLFolder = Path.GetDirectoryName(assemblyLocation);
-				string assetBundlePath = Path.Combine(DLLFolder, "sbmshader");
+				string assetBundlePath = Path.Combine(PATH, "sbmshader");
                 Output("AssetBundle path: " + assetBundlePath);
 				assetBundle = AssetBundle.LoadFromFile(assetBundlePath);
 
@@ -66,14 +61,13 @@ namespace CustomCharacterLoader
 			}
 		}
 
-
-
 		// Mod Start
 		public static void OnModStart()
         {
 			// Get Paths
 			PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
+            /* Might be useful for future things?
             Assembly assembly = Assembly.GetCallingAssembly();
             Type loader = assembly.GetType("BananaModManager.Loader.IL2Cpp.Loader");
             PropertyInfo infoList = loader.GetProperty("Mods");
@@ -92,6 +86,7 @@ namespace CustomCharacterLoader
                     Main.Output("Found Guest Characters Path");
                 }
             }
+            */
 
             // Create il2cpp objects
             var obj = new GameObject { hideFlags = HideFlags.HideAndDontSave };
@@ -108,7 +103,6 @@ namespace CustomCharacterLoader
             CharaOnSubmitPatch.CreateTimeAttackDetour();
             CharaNamePatch.CreateMainGameDetour();
             CharaNamePatch.CreateTimeAttackDetour();
-            MonkeyMutePatch.CreateDetour();
         }
 
         // Mod Update (Split by scene names)
@@ -127,9 +121,8 @@ namespace CustomCharacterLoader
             if (Main.sceneName == "MainMenu")
             {
                 Main.loadCharacter = false;
-                Main.playerLoader.Load();
                 try { Main.customCharacterManager.Load(); }
-                catch (Exception) { } // The mode likes to throw unimportant errors when this method loads too fast.
+                catch (Exception) { } // The mode likes to throw errors when this method loads too fast.
             }
             else if (Main.sceneName == "MainGame")
             {
