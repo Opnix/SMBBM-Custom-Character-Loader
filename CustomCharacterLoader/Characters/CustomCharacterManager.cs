@@ -43,10 +43,10 @@ namespace CustomCharacterLoader.CharacterManager
         }
 
         // Create character select icons for all custom characters
-        public static bool importedCharacters = false;
+        public bool importedCharacters = false;
         public void Load()
         {
-            if (!importedCharacters)
+            if (!this.importedCharacters)
             {
                 SelMgCharaItemDataListObject[] gameCharacterList = Resources.FindObjectsOfTypeAll<SelMgCharaItemDataListObject>(); // character select page
                 if (gameCharacterList != null && gameCharacterList.Length > 0)
@@ -56,7 +56,7 @@ namespace CustomCharacterLoader.CharacterManager
                         chara.CreateItemData(gameCharacterList[0]);
                     }
                     Main.Output("Created Custom Character Slots.");
-                    importedCharacters = true;
+                    this.importedCharacters = true;
                 }
             }
             Update(); // Make sure pictures stay

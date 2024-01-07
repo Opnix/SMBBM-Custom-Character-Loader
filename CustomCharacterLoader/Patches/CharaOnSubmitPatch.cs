@@ -8,6 +8,7 @@ using UnhollowerBaseLib.Runtime;
 using UnhollowerRuntimeLib;
 using CustomCharacterLoader.CharacterManager;
 using CustomCharacterLoader.PlayerManager;
+using Il2CppSystem.Collections.Generic;
 
 namespace CustomCharacterLoader.Patches
 {
@@ -24,20 +25,34 @@ namespace CustomCharacterLoader.Patches
 
             // check if player selected a custom character
             int index = 0;
-            foreach (CustomCharacter chara in Main.customCharacterManager.characters)
+            foreach (CustomCharacter chara in Main.characterManager.characters)
             {
                 if (iconID == chara.icon.GetInstanceID())
                 {
                     Main.playerLoader.playerType = PlayerLoader.CharacterType.Character;
                     Main.playerLoader.playerIndex = index;
                     Main.playerLoader.CheckPlayerType();
+
+                    // add announcer voiceline?
                     
-                    // add cuesheet to sound
-                    if(Main.playerLoader.selectedCharacter.monkey_acb != "")
+
+                    foreach(var cue in Sound.Instance.m_cueParamDict)
                     {
-                        Sound.Instance.m_cueSheetParamDict[(sound_id.cuesheet)6969] = new Sound.cuesheet_param_t("6969", Main.playerLoader.selectedCharacter.monkey_acb, null); //monkey_acb = full file path
-                        Sound.Instance.LoadCueSheetASync((sound_id.cuesheet)6969);
+                        Console.WriteLine(cue.Key);
                     }
+                    // add voice cuesheet to sound
+                    if (Main.playerLoader.selectedCharacter.monkey_acb != "")
+                    {
+                        
+                    }
+                    /*
+                    // add banana cuesheet to sound
+                    if (Main.playerLoader.selectedCharacter.banana_acb != "")
+                    {
+                        Sound.Instance.m_cueSheetParamDict[(sound_id.cuesheet)6970] = new Sound.cuesheet_param_t("6970", Main.playerLoader.selectedCharacter.banana_acb, null); //monkey_acb = full file path
+                        Sound.Instance.LoadCueSheetASync((sound_id.cuesheet)6970);
+                    }
+                    */
 
                     break;
                 }

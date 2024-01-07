@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Dependencies.rar" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="7.0.0" />
   </ItemGroup>
 
@@ -61,7 +65,7 @@
       <HintPath>..\Dependencies\UnityEngine.CoreModule.dll</HintPath>
 	</Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>C:\Users\maxgo\source\repos\SMBBM-Custom-Character-Loader\CustomCharacterLoader\Dependencies\UnityEngine.UI.dll</HintPath>
+      <HintPath>C:\SteamLibrary\steamapps\common\smbbm\managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -20,7 +20,7 @@ namespace CustomCharacterLoader.Patches
             SelMgCharaSelectWindow _instance = new(_thisPtr);
 
             int charaIconId = selectedChara.costumeList[0].spriteIcon.GetInstanceID();
-            foreach(CharacterManager.CustomCharacter character in Main.customCharacterManager.characters)
+            foreach(CharacterManager.CustomCharacter character in Main.characterManager.characters)
             {
                 if(character.icon.GetInstanceID() == charaIconId)
                 {

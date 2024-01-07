@@ -9,7 +9,7 @@ using System.Reflection;
 using CustomCharacterLoader.CharacterManager;
 using CustomCharacterLoader.Patches;
 using CustomCharacterLoader.PlayerManager;
-using UnityEngine.UI;
+using CustomCharacterLoader.Sounds;
 
 namespace CustomCharacterLoader
 {
@@ -19,15 +19,14 @@ namespace CustomCharacterLoader
         public static string PATH = "";
 
         // Mod Objects
-        public static CustomCharacterList customCharacterManager = null;
+        public static CustomCharacterManager characterManager = null;
         public static PlayerLoader playerLoader = null;
+        public static SoundImporter soundManager = null;
 
 		// Asset Bundle
 		public static AssetBundle assetBundle;
 		public static Shader CustomShader { get; private set; }
-        private static GameObject pauseChara = null;
-        private static Image imageComponent = null;
-        private static Sprite pauseSprite = null;
+        
         // Console Text
         public static void Output(string text)
         {
@@ -35,28 +34,21 @@ namespace CustomCharacterLoader
             Console.WriteLine("CustomCharacterLoader: " + text);
             Console.ForegroundColor = ConsoleColor.White;
         }
-
-		// Mod Load
-		public static void OnModLoad(Dictionary<string, object> settings)
-		{
-		}
-
-		private static void LoadAssetBundle()
+        private static void LoadAssetBundle()
 		{
 			if (assetBundle == null)
 			{
-				Output("Loading AssetBundle...");
+				Output("Loading Shader AssetBundle...");
 				string assetBundlePath = Path.Combine(PATH, "sbmshader");
-                Output("AssetBundle path: " + assetBundlePath);
 				assetBundle = AssetBundle.LoadFromFile(assetBundlePath);
 
 				if (assetBundle != null)
 				{
-					Output("AssetBundle loaded successfully.");
+					Output("Shader AssetBundle loaded successfully.");
 				}
 				else
 				{
-					Output("Failed to load AssetBundle.");
+					Output("Failed to load Shader AssetBundle. Make sure \"" + assetBundlePath + "\" exists.");
 				}
 			}
 			else
@@ -70,36 +62,18 @@ namespace CustomCharacterLoader
 			// Get Paths
 			PATH = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            /* Might be useful for future things?
-            Assembly assembly = Assembly.GetCallingAssembly();
-            Type loader = assembly.GetType("BananaModManager.Loader.IL2Cpp.Loader");
-            PropertyInfo infoList = loader.GetProperty("Mods");
-            List<BananaModManager.Shared.Mod> mods = (List<BananaModManager.Shared.Mod>)infoList.GetValue(loader);
-            foreach (var mod in mods)
-            {
-                string modName = mod.GetAssembly().ToString().Split(',')[0];
-                if (modName == "Dynamic Sounds (Main Cast)")
-                {
-                    Main.DYNAMIC_SOUNDS_PATH = mod.Directory.ToString();
-                    Main.Output("Found Dynamic Sounds Path");
-                }
-                else if(modName == "GuestCharacters")
-                {
-                    Main.GUEST_CHARACTER_PATH = mod.Directory.ToString();
-                    Main.Output("Found Guest Characters Path");
-                }
-            }
-            */
-
             // Create il2cpp objects
             var obj = new GameObject { hideFlags = HideFlags.HideAndDontSave };
             Object.DontDestroyOnLoad(obj);
 
-            ClassInjector.RegisterTypeInIl2Cpp(typeof(CustomCharacterList));
-            Main.customCharacterManager = new CustomCharacterList(obj.AddComponent(Il2CppType.Of<CustomCharacterList>()).Pointer, Path.Combine(Main.PATH, "Characters\\"));
+            ClassInjector.RegisterTypeInIl2Cpp(typeof(CustomCharacterManager));
+            Main.characterManager = new CustomCharacterManager(obj.AddComponent(Il2CppType.Of<CustomCharacterManager>()).Pointer, Path.Combine(Main.PATH, "Characters\\"));
 
             ClassInjector.RegisterTypeInIl2Cpp(typeof(PlayerLoader));
             Main.playerLoader = new PlayerLoader(obj.AddComponent(Il2CppType.Of<PlayerLoader>()).Pointer);
+
+            ClassInjector.RegisterTypeInIl2Cpp(typeof(SoundImporter));
+            Main.soundManager = new SoundImporter(obj.AddComponent(Il2CppType.Of<SoundImporter>()).Pointer);
 
             // Create detours
             CharaOnSubmitPatch.CreateMainGameDetour();
@@ -107,7 +81,7 @@ namespace CustomCharacterLoader
             CharaNamePatch.CreateMainGameDetour();
             CharaNamePatch.CreateTimeAttackDetour();
             GetCueSheetPatch.CreateGetCueSheetDetour();
-            //testPatch.CreateGetCueSheetDetour();
+            testPatch.CreateGetCueSheetDetour();
         }
 
         // Mod Update (Split by scene names)
@@ -115,42 +89,25 @@ namespace CustomCharacterLoader
         public static bool loadCharacter = false;
         public static void OnModUpdate()
         {
-			// Load character. scene names change per level... I don't care to keep track of all those names...
-			LoadAssetBundle();
-			if (loadCharacter)
+            LoadAssetBundle();
+            // Load character. scene names change per level... I don't care to keep track of all those names...
+            if (loadCharacter)
             {
                 Main.playerLoader.LoadPlayer(assetBundle);
-                if (playerLoader.playerType != PlayerLoader.CharacterType.None)
-                {
-                    if (pauseSprite == null)
-                    {
-                        pauseSprite = playerLoader.LoadPause(Main.playerLoader.selectedCharacter.asset);
-                    }
-                    if (pauseChara != null)
-                    {
-                        if (imageComponent != null)
-                        {
-                            imageComponent.sprite = pauseSprite;
-                        }
-                        else
-                        {
-                            imageComponent = pauseChara.transform.GetChild(0).GetComponent<Image>();
-                        }
-                    }
-                    else
-                    {
-                        pauseChara = GameObject.Find("pos_pause_chara");
-                    }
-                }
             }
             
             Main.sceneName = SceneManager.GetActiveScene().name;
             if (Main.sceneName == "MainMenu")
             {
                 Main.loadCharacter = false;
-                try { Main.customCharacterManager.Load(); }
-                catch (Exception e) {} // The mode likes to throw errors when this method loads too fast.
-			}
+                try {soundManager.Load();}
+                catch (Exception) { } // The mode likes to throw errors when this method loads too fast.
+                if(soundManager.importedSounds)
+                {
+                    try {characterManager.Load();}
+                    catch (Exception) { } // The mode likes to throw errors when this method loads too fast.
+                }
+            }
             else if (Main.sceneName == "MainGame")
             {
                 Main.loadCharacter = true;
@@ -158,3 +115,25 @@ namespace CustomCharacterLoader
         }
     }
 }
+
+
+/* Might be useful for future things? Checks if other mods are active
+Assembly assembly = Assembly.GetCallingAssembly();
+Type loader = assembly.GetType("BananaModManager.Loader.IL2Cpp.Loader");
+PropertyInfo infoList = loader.GetProperty("Mods");
+List<BananaModManager.Shared.Mod> mods = (List<BananaModManager.Shared.Mod>)infoList.GetValue(loader);
+foreach (var mod in mods)
+{
+    string modName = mod.GetAssembly().ToString().Split(',')[0];
+    if (modName == "Dynamic Sounds (Main Cast)")
+    {
+        Main.DYNAMIC_SOUNDS_PATH = mod.Directory.ToString();
+        Main.Output("Found Dynamic Sounds Path");
+    }
+    else if(modName == "GuestCharacters")
+    {
+        Main.GUEST_CHARACTER_PATH = mod.Directory.ToString();
+        Main.Output("Found Guest Characters Path");
+    }
+}
+*/
