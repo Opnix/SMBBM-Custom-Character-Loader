@@ -89,6 +89,7 @@ namespace CustomCharacterLoader.CharacterManager
             // Character Select Sprites
             this.icon = this.asset.LoadAsset<Sprite>("icon");
             this.banner = this.asset.LoadAsset<Sprite>("banner");
+            this.pause = this.asset.LoadAsset<Sprite>("Pictures/pause");
 
             // Item Data class
             this.itemData = new SelMgCharaItemData();

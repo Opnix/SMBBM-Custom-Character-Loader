@@ -23,11 +23,13 @@ namespace CustomCharacterLoader
         public static PlayerLoader playerLoader = null;
 
 		// Asset Bundle
-		private static AssetBundle assetBundle;
+		public static AssetBundle assetBundle;
 		public static Shader CustomShader { get; private set; }
-
-		// Console Text
-		public static void Output(string text)
+        private static GameObject pauseChara = null;
+        private static Image imageComponent = null;
+        private static Sprite pauseSprite = null;
+        // Console Text
+        public static void Output(string text)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("CustomCharacterLoader: " + text);
@@ -118,14 +120,36 @@ namespace CustomCharacterLoader
 			if (loadCharacter)
             {
                 Main.playerLoader.LoadPlayer(assetBundle);
+                if (playerLoader.playerType != PlayerLoader.CharacterType.None)
+                {
+                    if (pauseSprite == null)
+                    {
+                        pauseSprite = playerLoader.LoadPause(Main.playerLoader.selectedCharacter.asset);
+                    }
+                    if (pauseChara != null)
+                    {
+                        if (imageComponent != null)
+                        {
+                            imageComponent.sprite = pauseSprite;
+                        }
+                        else
+                        {
+                            imageComponent = pauseChara.transform.GetChild(0).GetComponent<Image>();
+                        }
+                    }
+                    else
+                    {
+                        pauseChara = GameObject.Find("pos_pause_chara");
+                    }
+                }
             }
-
+            
             Main.sceneName = SceneManager.GetActiveScene().name;
             if (Main.sceneName == "MainMenu")
             {
                 Main.loadCharacter = false;
                 try { Main.customCharacterManager.Load(); }
-                catch (Exception) { } // The mode likes to throw errors when this method loads too fast.
+                catch (Exception e) {} // The mode likes to throw errors when this method loads too fast.
 			}
             else if (Main.sceneName == "MainGame")
             {
