@@ -105,6 +105,7 @@ namespace CustomCharacterLoader.CharacterManager
             costume._spriteIcon_k__BackingField = this.icon;
             costume.spritePicture = this.banner;
             costume._spritePicture_k__BackingField = this.banner;
+
             this.itemData.m_CostumeList.Add(costume);
 
             // Item Data Cont..

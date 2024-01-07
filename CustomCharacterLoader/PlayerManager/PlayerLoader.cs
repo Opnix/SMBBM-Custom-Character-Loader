@@ -12,6 +12,9 @@ using CustomCharacterLoader.CharacterManager;
 using UnhollowerBaseLib;
 using Il2CppSystem.Reflection;
 using BananaModManager.Shared;
+using System.Net.NetworkInformation;
+using UnityEngine.UI;
+using Framework.UI;
 
 namespace CustomCharacterLoader.PlayerManager
 {
@@ -53,13 +56,14 @@ namespace CustomCharacterLoader.PlayerManager
                 if (customPlayerObject == null)
                 {
                     customPlayerObject = ReplaceModel(selectedCharacter, AssetBundle);
-                }
+				}
             }
         }
 
         // Replace ingame model
         public static GameObject ReplaceModel(CustomCharacter selectedCharacter, AssetBundle assetbundle)
         {
+            GRAH(selectedCharacter, assetbundle);
             GameObject customPlayerObject = null;
             Il2CppArrayBase<Player> players = Resources.FindObjectsOfTypeAll<Player>(); // FUTURE ME, THIS DONT WORK WITH MULTIPLE PLAYERS
             if (players.Length > 1)
@@ -88,8 +92,32 @@ namespace CustomCharacterLoader.PlayerManager
                 playerContainer.GetComponent<MonkeyRef>().m_Animator = customAnimator;
                 playerContainer.GetComponent<Monkey>().m_Animator = customAnimator;
                 playerContainer.transform.rotation = rotation;
-            }
+				//GameObject.Find("pause_chara").GetComponent<Image>().sprite = selectedCharacter.pause;  // IF THIS SHIT IS DEAD FOR YOU, HARDCODE THE UNITY UI DEPENDENCY
+			}
             return customPlayerObject;
         }
+		public static void GRAH(CustomCharacter selectedCharacter, AssetBundle assetbundle)
+		{
+            GameObject pauseChara = null;
+
+			if (pauseChara != null)
+			{
+				Image imageComponent = pauseChara.GetComponent<Image>();
+
+				if (imageComponent != null)
+				{
+					imageComponent.sprite = selectedCharacter.pause;
+				}
+				else
+				{
+					Main.Output("Image component not found on 'pause_chara' GameObject.");
+				}
+			}
+			else
+			{
+                pauseChara = GameObject.Find("pos_pause_chara").transform.GetChild(0).gameObject;
+				Main.Output("'pause_chara' GameObject not found.");
+			}
+		}
 	}
 }

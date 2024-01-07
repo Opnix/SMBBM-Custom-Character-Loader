@@ -59,6 +59,9 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependencies\UnityEngine.CoreModule.dll</HintPath>
+	</Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>C:\Users\maxgo\source\repos\SMBBM-Custom-Character-Loader\CustomCharacterLoader\Dependencies\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -9,6 +9,7 @@ using System.Reflection;
 using CustomCharacterLoader.CharacterManager;
 using CustomCharacterLoader.Patches;
 using CustomCharacterLoader.PlayerManager;
+using UnityEngine.UI;
 
 namespace CustomCharacterLoader
 {
@@ -125,7 +126,7 @@ namespace CustomCharacterLoader
                 Main.loadCharacter = false;
                 try { Main.customCharacterManager.Load(); }
                 catch (Exception) { } // The mode likes to throw errors when this method loads too fast.
-            }
+			}
             else if (Main.sceneName == "MainGame")
             {
                 Main.loadCharacter = true;
