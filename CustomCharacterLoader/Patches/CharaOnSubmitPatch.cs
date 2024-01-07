@@ -31,6 +31,14 @@ namespace CustomCharacterLoader.Patches
                     Main.playerLoader.playerType = PlayerLoader.CharacterType.Character;
                     Main.playerLoader.playerIndex = index;
                     Main.playerLoader.CheckPlayerType();
+                    
+                    // add cuesheet to sound
+                    if(Main.playerLoader.selectedCharacter.monkey_acb != "")
+                    {
+                        Sound.Instance.m_cueSheetParamDict[(sound_id.cuesheet)6969] = new Sound.cuesheet_param_t("6969", Main.playerLoader.selectedCharacter.monkey_acb, null); //monkey_acb = full file path
+                        Sound.Instance.LoadCueSheetASync((sound_id.cuesheet)6969);
+                    }
+
                     break;
                 }
                 index++;

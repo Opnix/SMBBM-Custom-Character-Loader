@@ -103,6 +103,8 @@ namespace CustomCharacterLoader
             CharaOnSubmitPatch.CreateTimeAttackDetour();
             CharaNamePatch.CreateMainGameDetour();
             CharaNamePatch.CreateTimeAttackDetour();
+            GetCueSheetPatch.CreateGetCueSheetDetour();
+            //testPatch.CreateGetCueSheetDetour();
         }
 
         // Mod Update (Split by scene names)

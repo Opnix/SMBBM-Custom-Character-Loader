@@ -14,6 +14,7 @@ namespace CustomCharacterLoader.CharacterManager
         public string charaName = "";
         public string assetName = "";
         public string base_monkey = "jam";
+        public string monkey_acb = "";
 
         // Super Monkey Ball Objects
         public SelMgCharaItemData itemData;
@@ -28,6 +29,7 @@ namespace CustomCharacterLoader.CharacterManager
         {
             public string asset_bundle { get; set; }
             public string base_monkey { get; set; } = "jam";
+            public string monkey_acb { get; set; } = "";
         }
 
         // Reads a json file then get the asset bundle and base_character
@@ -44,27 +46,30 @@ namespace CustomCharacterLoader.CharacterManager
 
             this.charaName = characterName;
             this.assetName = template.asset_bundle;
+            this.monkey_acb = Path.Combine(dir, template.monkey_acb);
 
             // Open asset bundle
             try
             {
                 Main.Output("Loading Character: " + this.charaName);
                 this.asset = AssetBundle.LoadFromFile(Path.Combine(dir, this.assetName));
+
+                if (this.asset == null)
+                {
+                    Main.Output("Cant find Asset bundle:" + dir + this.assetName);
+                }
+                else
+                {
+                    Main.Output("Loaded Asset Bundle: " + this.assetName);
+                }
             }
             catch (Exception ex)
             {
                 Main.Output("Unable to load file: " + Path.Combine(dir, this.assetName));
             }
 
-            // Check if asset bundle loaded
-            if (this.asset == null)
-            {
-                Main.Output("Cant find Asset bundle:" + dir + this.assetName);
-            }
-            else
-            {
-                Main.Output("Loaded Asset Bundle: " + this.assetName);
-            }
+            // Open sound files
+
         }
 
         // Create item data for character select screen
