@@ -142,11 +142,11 @@ namespace CustomCharacterLoader.CharacterManager
             {
                 foreach (Material material in meshRenderer.materials)
                 {
-                    if (!material.name.Contains("balls") && !material.name.Contains("Eye"))
+                    if (!material.name.Contains("balls") && !material.name.Contains("Eye") && !material.name.Contains("Custom") && !material.name.Contains("Alpha")) // if someone asks for yet another exception throw them out a window
                     {
                         material.shader = shader;
                     }
-                    else if (material.name.Contains("Eye"))
+                    else if (material.name.Contains("Eye") && material.name.Contains("Alpha"))
                     {
                         material.shader = eyeShader;
                     }
