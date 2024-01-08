@@ -36,13 +36,19 @@ namespace CustomCharacterLoader.Sounds
                     Console.WriteLine("Loading sounds");
                     foreach (CustomCharacter character in Main.characterManager.characters)
                     {
-                        if (character.monkey_acb != null)
+                        if (!String.IsNullOrEmpty(character.monkey_acb))
                         {
                             Sound.Instance.m_cueSheetParamDict[(sound_id.cuesheet)sound_id] = new Sound.cuesheet_param_t(sound_id.ToString(), character.monkey_acb, null); //monkey_acb = full file path
-                            Sound.Instance.m_cueParamDict[(sound_id.cue)cue_id] = new Sound.cue_param_t((sound_id.cuesheet)sound_id, "start");
+                            Sound.Instance.LoadCueSheetASync((sound_id.cuesheet)sound_id);
+                            character.monkey_voice_id = sound_id;
+                            sound_id++;
+                        }
+                        if (!String.IsNullOrEmpty(character.announcer_acb))
+                        {
+                            Sound.Instance.m_cueSheetParamDict[(sound_id.cuesheet)sound_id] = new Sound.cuesheet_param_t(sound_id.ToString(), character.announcer_acb, null); //monkey_acb = full file path
+                            Sound.Instance.m_cueParamDict[(sound_id.cue)cue_id] = new Sound.cue_param_t((sound_id.cuesheet)sound_id, "Cue_02");
                             Sound.Instance.LoadCueSheetASync((sound_id.cuesheet)sound_id);
                             character.cue_id = cue_id;
-                            character.monkey_voice_id = sound_id;
                             sound_id++;
                             cue_id++;
                         }

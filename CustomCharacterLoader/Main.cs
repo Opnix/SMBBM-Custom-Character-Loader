@@ -81,7 +81,6 @@ namespace CustomCharacterLoader
             CharaNamePatch.CreateMainGameDetour();
             CharaNamePatch.CreateTimeAttackDetour();
             GetCueSheetPatch.CreateGetCueSheetDetour();
-            testPatch.CreateGetCueSheetDetour();
         }
 
         // Mod Update (Split by scene names)
@@ -115,7 +114,6 @@ namespace CustomCharacterLoader
         }
     }
 }
-
 
 /* Might be useful for future things? Checks if other mods are active
 Assembly assembly = Assembly.GetCallingAssembly();

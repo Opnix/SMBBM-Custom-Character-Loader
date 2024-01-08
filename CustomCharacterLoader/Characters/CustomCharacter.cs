@@ -16,11 +16,11 @@ namespace CustomCharacterLoader.CharacterManager
         public string charaName = "";
         public string assetName = "";
         public string base_monkey = "jet";
-        public int monkey_voice_id = 0;
-        public int cue_id = 0;
         public string monkey_acb = "";
+        public int monkey_voice_id = 0;
         public string banana_acb = "";
         public string announcer_acb = "";
+        public int cue_id = 0;
 
         // Super Monkey Ball Objects
         public SelMgCharaItemData itemData;
@@ -29,7 +29,7 @@ namespace CustomCharacterLoader.CharacterManager
         public AssetBundle asset;
         public Sprite icon;
         public Sprite banner;
-        public Sprite pause; // NOT IMPLEMENTED
+        public Sprite pause;
 
         private class CharacterJsonTemplate
         {
@@ -37,6 +37,7 @@ namespace CustomCharacterLoader.CharacterManager
             public string base_monkey { get; set; } = "jet";
             public string monkey_acb { get; set; } = "";
             public string banana_acb { get; set; } = "";
+            public string announcer_acb { get; set; } = "";
         }
 
         // Reads a json file then get the asset bundle and base_character
@@ -79,6 +80,12 @@ namespace CustomCharacterLoader.CharacterManager
             if(sounds != null)
             {
                 this.monkey_acb =  Path.Combine(dir, template.monkey_acb);
+                sounds.Dispose();
+            }
+            sounds = CriAtomExAcb.LoadAcbFile(null, Path.Combine(dir, template.announcer_acb), null);
+            if (sounds != null)
+            {
+                this.announcer_acb = Path.Combine(dir, template.announcer_acb);
                 sounds.Dispose();
             }
         }
@@ -124,22 +131,29 @@ namespace CustomCharacterLoader.CharacterManager
             this.itemData.m_DescriptionText = clone.m_DescriptionText;
             this.itemData.m_IsHideText = clone.m_IsHideText;
 
-            IntPtr cueIdPtr = IL2CPP.GetIl2CppNestedType(IL2CPP.GetIl2CppClass("Assembly-CSharp.dll", "Flash2", "sound_id"), "cue");
-            Il2CppSystem.Type cueIdType = UnhollowerRuntimeLib.Il2CppType.TypeFromPointer(cueIdPtr);
+            if(!String.IsNullOrEmpty(this.announcer_acb))
+            {
+                IntPtr cueIdPtr = IL2CPP.GetIl2CppNestedType(IL2CPP.GetIl2CppClass("Assembly-CSharp.dll", "Flash2", "sound_id"), "cue");
+                Il2CppSystem.Type cueIdType = UnhollowerRuntimeLib.Il2CppType.TypeFromPointer(cueIdPtr);
 
-            Il2CppSystem.Reflection.Assembly assembly = Il2CppSystem.AppDomain.CurrentDomain.GetAssemblies().Single(a => a.GetName().Name == "Assembly-CSharp");
-            Il2CppSystem.Type enumRuntimeHelper = assembly.GetType("Framework.EnumRuntimeHelper`1");
-            Il2CppSystem.Type erhCue = enumRuntimeHelper.MakeGenericType(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[] { cueIdType }));
+                Il2CppSystem.Reflection.Assembly assembly = Il2CppSystem.AppDomain.CurrentDomain.GetAssemblies().Single(a => a.GetName().Name == "Assembly-CSharp");
+                Il2CppSystem.Type enumRuntimeHelper = assembly.GetType("Framework.EnumRuntimeHelper`1");
+                Il2CppSystem.Type erhCue = enumRuntimeHelper.MakeGenericType(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[] { cueIdType }));
 
-            Il2CppSystem.Reflection.MethodInfo cueValToNameGetter = erhCue.GetProperty("valueToNameCollection").GetGetMethod();
-            Il2CppSystem.Collections.Generic.Dictionary<sound_id.cue, string> cueValToName = cueValToNameGetter.Invoke(null, new Il2CppReferenceArray<Il2CppSystem.Object>(0)).Cast<Il2CppSystem.Collections.Generic.Dictionary<sound_id.cue, string>>();
-            cueValToName.Add((sound_id.cue)this.cue_id, this.cue_id.ToString());
+                Il2CppSystem.Reflection.MethodInfo cueValToNameGetter = erhCue.GetProperty("valueToNameCollection").GetGetMethod();
+                Il2CppSystem.Collections.Generic.Dictionary<sound_id.cue, string> cueValToName = cueValToNameGetter.Invoke(null, new Il2CppReferenceArray<Il2CppSystem.Object>(0)).Cast<Il2CppSystem.Collections.Generic.Dictionary<sound_id.cue, string>>();
+                cueValToName.Add((sound_id.cue)this.cue_id, this.cue_id.ToString());
 
-            Il2CppSystem.Reflection.MethodInfo cueNameToValGetter = erhCue.GetProperty("nameToValueCollection").GetGetMethod();
-            Il2CppSystem.Collections.Generic.Dictionary<string, sound_id.cue> cueNameToVal = cueNameToValGetter.Invoke(null, new Il2CppReferenceArray<Il2CppSystem.Object>(0)).Cast<Il2CppSystem.Collections.Generic.Dictionary<string, sound_id.cue>>();
-            cueNameToVal.Add(this.cue_id.ToString(), (sound_id.cue)this.cue_id);
+                Il2CppSystem.Reflection.MethodInfo cueNameToValGetter = erhCue.GetProperty("nameToValueCollection").GetGetMethod();
+                Il2CppSystem.Collections.Generic.Dictionary<string, sound_id.cue> cueNameToVal = cueNameToValGetter.Invoke(null, new Il2CppReferenceArray<Il2CppSystem.Object>(0)).Cast<Il2CppSystem.Collections.Generic.Dictionary<string, sound_id.cue>>();
+                cueNameToVal.Add(this.cue_id.ToString(), (sound_id.cue)this.cue_id);
 
-            this.itemData.m_NarrationCueID = this.cue_id.ToString();
+                this.itemData.m_NarrationCueID = this.cue_id.ToString();
+            }
+            else
+            {
+                this.itemData.m_NarrationCueID = clone.m_NarrationCueID;
+            }
             this.itemData.m_PointShopID = "Invalid";
             this.itemData.m_SupplementaryText = clone.m_SupplementaryText;
             this.itemData.m_Text = clone.m_Text;

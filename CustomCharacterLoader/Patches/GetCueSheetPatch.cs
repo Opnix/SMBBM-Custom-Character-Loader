@@ -36,27 +36,4 @@ namespace CustomCharacterLoader.Patches
             }
         }
     }
-    public static class testPatch
-    {
-        // Delegate to rename character banner
-        private delegate void handle_play_delegate(IntPtr _thisPtr, IntPtr cuesheetname, IntPtr cuename);
-
-        // Main Game
-        private static handle_play_delegate customMethod;
-        private static handle_play_delegate originalMethod;
-        public static unsafe void CreateGetCueSheetDetour()
-        {
-            customMethod = handle_play;
-            var original = typeof(Sound.handle_param_t).GetMethod(nameof(Sound.handle_param_t.Play), new Type[] { typeof(String), typeof(String) });
-            var methodInfo = UnityVersionHandler.Wrap((Il2CppMethodInfo*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(original).GetValue(null));
-            originalMethod = ClassInjector.Detour.Detour(methodInfo.MethodPointer, customMethod);
-        }
-        static void handle_play(IntPtr _thisPtr, IntPtr cuesheetname, IntPtr cuename)
-        {
-            string cuenameString = IL2CPP.Il2CppStringToManaged(cuename);
-            string cuesheetnameString = IL2CPP.Il2CppStringToManaged(cuesheetname);
-            Console.WriteLine("BAAAAA "+cuesheetnameString + ", " + cuenameString);
-            originalMethod(_thisPtr, cuesheetname, cuename);
-        }
-    }
 }

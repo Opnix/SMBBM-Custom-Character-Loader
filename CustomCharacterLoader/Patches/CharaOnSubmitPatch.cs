@@ -32,28 +32,6 @@ namespace CustomCharacterLoader.Patches
                     Main.playerLoader.playerType = PlayerLoader.CharacterType.Character;
                     Main.playerLoader.playerIndex = index;
                     Main.playerLoader.CheckPlayerType();
-
-                    // add announcer voiceline?
-                    
-
-                    foreach(var cue in Sound.Instance.m_cueParamDict)
-                    {
-                        Console.WriteLine(cue.Key);
-                    }
-                    // add voice cuesheet to sound
-                    if (Main.playerLoader.selectedCharacter.monkey_acb != "")
-                    {
-                        
-                    }
-                    /*
-                    // add banana cuesheet to sound
-                    if (Main.playerLoader.selectedCharacter.banana_acb != "")
-                    {
-                        Sound.Instance.m_cueSheetParamDict[(sound_id.cuesheet)6970] = new Sound.cuesheet_param_t("6970", Main.playerLoader.selectedCharacter.banana_acb, null); //monkey_acb = full file path
-                        Sound.Instance.LoadCueSheetASync((sound_id.cuesheet)6970);
-                    }
-                    */
-
                     break;
                 }
                 index++;
