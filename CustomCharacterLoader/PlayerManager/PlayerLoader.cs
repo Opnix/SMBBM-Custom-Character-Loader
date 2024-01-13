@@ -32,6 +32,8 @@ namespace CustomCharacterLoader.PlayerManager
 
         // Loading character stuff
         public CustomCharacter selectedCharacter;
+        public static bool loadBanana = false;
+        private GameObject customBananaObject = null;
         private GameObject customPlayerObject;
         private static GameObject pauseChara = null;
         private static Image imageComponent = null;
@@ -53,18 +55,22 @@ namespace CustomCharacterLoader.PlayerManager
                 Main.loadCharacter = false;
             }
         }
-
+        
         // Insert character into the game
         public void LoadPlayer(AssetBundle AssetBundle)
         {
             if (playerType == CharacterType.Character)
             {
+
+                if (selectedCharacter.banana_bundle != null & customBananaObject == null)
+                {
+                    customBananaObject = ReplaceBananas(selectedCharacter, AssetBundle);
+                }
+
                 // Look for player object
                 if (customPlayerObject == null)
                 {
                     customPlayerObject = ReplaceModel(selectedCharacter, AssetBundle);
-
-                    //ReplaceBanana(selectedCharacter, AssetBundle);
                 }
 
                 // Change Pause Icon
@@ -88,6 +94,37 @@ namespace CustomCharacterLoader.PlayerManager
                     pauseChara = GameObject.Find("pos_pause_chara");
                 }
             }
+        }
+
+        public static GameObject ReplaceBananas(CustomCharacter selectedCharacter, AssetBundle assetbundle)
+        {
+            GameObject aBanana = null;
+            Il2CppArrayBase<Banana> bananas = Object.FindObjectsOfType<Banana>();
+            if (bananas.Length > 1)
+            {
+                Shader shader = assetbundle.LoadAsset<Shader>("assets/eatass2.shader");
+                foreach (var banana in bananas)
+                {
+                    aBanana = banana.gameObject;
+                    GameObject bananaObject = null;
+                    var rendererList = banana.GetComponentsInChildren<MeshRenderer>();
+                    foreach (MeshRenderer renderer in rendererList)
+                    {
+                        bananaObject = selectedCharacter.InitializeBanana(banana.kind, renderer, shader);
+                        renderer.gameObject.transform.localScale = bananaObject.transform.localScale;
+                        if (banana.kind == Banana.eKind.Fusa || banana.kind == Banana.eKind.Normal)
+                        {
+                            renderer.material = bananaObject.GetComponent<MeshRenderer>().material;
+                        }
+                    }
+                    var filterList = banana.GetComponentsInChildren<MeshFilter>();
+                    foreach (MeshFilter filter in filterList)
+                    {
+                        filter.mesh = bananaObject.GetComponent<MeshFilter>().mesh;
+                    }
+                }
+            }
+            return aBanana;
         }
 
         // Replace ingame model
@@ -126,36 +163,3 @@ namespace CustomCharacterLoader.PlayerManager
         }
 	}
 }
-
-
-// Replace Banana model
-/*
-public static void ReplaceBanana(CustomCharacter selectedCharacter, AssetBundle assetbundle)
-{
-    Il2CppArrayBase<Banana> bananas = Resources.FindObjectsOfTypeAll<Banana>();
-    if (bananas.Length > 1)
-    {
-        Shader shader = assetbundle.LoadAsset<Shader>("assets/eatass2.shader");
-
-        // make base character model invisible
-        foreach (var component in playerContainer.GetComponentsInChildren<SkinnedMeshRenderer>())
-        {
-            component.enabled = false;
-        }
-        foreach (var component in playerContainer.GetComponentsInChildren<MeshRenderer>())
-        {
-            component.enabled = false;
-        }
-
-        // load custom character
-        customPlayerObject = selectedCharacter.InitializeCharacter(shader, eyeShader);
-        Quaternion rotation = playerContainer.transform.rotation;
-        playerContainer.transform.rotation = Quaternion.Euler(0, 0, 0);
-        customPlayerObject.transform.parent = target_model.transform;
-        Animator customAnimator = customPlayerObject.GetComponentInChildren<Animator>();
-        playerContainer.GetComponent<MonkeyRef>().m_Animator = customAnimator;
-        playerContainer.GetComponent<Monkey>().m_Animator = customAnimator;
-        playerContainer.transform.rotation = rotation;
-    }
-}
-*/

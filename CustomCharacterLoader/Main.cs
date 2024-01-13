@@ -21,7 +21,7 @@ namespace CustomCharacterLoader
         // Mod Objects
         public static CustomCharacterManager characterManager = null;
         public static PlayerLoader playerLoader = null;
-        public static SoundImporter soundManager = null;
+        public static SoundImporter soundImporter = null;
 
 		// Asset Bundle
 		public static AssetBundle assetBundle;
@@ -73,7 +73,7 @@ namespace CustomCharacterLoader
             Main.playerLoader = new PlayerLoader(obj.AddComponent(Il2CppType.Of<PlayerLoader>()).Pointer);
 
             ClassInjector.RegisterTypeInIl2Cpp(typeof(SoundImporter));
-            Main.soundManager = new SoundImporter(obj.AddComponent(Il2CppType.Of<SoundImporter>()).Pointer);
+            Main.soundImporter = new SoundImporter(obj.AddComponent(Il2CppType.Of<SoundImporter>()).Pointer);
 
             // Create detours
             CharaOnSubmitPatch.CreateMainGameDetour();
@@ -92,24 +92,24 @@ namespace CustomCharacterLoader
             // Load character. scene names change per level... I don't care to keep track of all those names...
             if (loadCharacter)
             {
-                Main.playerLoader.LoadPlayer(assetBundle);
+                playerLoader.LoadPlayer(assetBundle);
             }
             
-            Main.sceneName = SceneManager.GetActiveScene().name;
-            if (Main.sceneName == "MainMenu")
+            sceneName = SceneManager.GetActiveScene().name;
+            if (sceneName == "MainMenu")
             {
-                Main.loadCharacter = false;
-                try {soundManager.Load();}
+                loadCharacter = false;
+                try {soundImporter.Load();}
                 catch (Exception) { } // The mode likes to throw errors when this method loads too fast.
-                if(soundManager.importedSounds)
+                if(soundImporter.importedSounds)
                 {
                     try {characterManager.Load();}
                     catch (Exception) { } // The mode likes to throw errors when this method loads too fast.
                 }
             }
-            else if (Main.sceneName == "MainGame")
+            else if (sceneName == "MainGame")
             {
-                Main.loadCharacter = true;
+                loadCharacter = true;
             }
         }
     }

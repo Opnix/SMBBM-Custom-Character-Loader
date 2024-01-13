@@ -13,20 +13,23 @@ namespace CustomCharacterLoader.CharacterManager
 {
     public class CustomCharacter : UnityEngine.Object
     {
-        public string charaName = "";
-        public string assetName = "";
-        public string base_monkey = "jet";
+        // Sound Stuff
         public string monkey_acb = "";
-        public int monkey_voice_id = 0;
         public string banana_acb = "";
         public string announcer_acb = "";
-        public int cue_id = 0;
+        public int aCue = 0;
+        public int monkey_voice_id = 0;
 
-        // Super Monkey Ball Objects
+        // Chara Select Stuff
         public SelMgCharaItemData itemData;
+        public string base_monkey = "jet";
+        public string charaName = "";
 
         // Unity Asset Bundle Stuff
+        public string assetName = "";
         public AssetBundle asset;
+        public AssetBundle banana_bundle;
+        public bool[] bananaTypes = {false, false};
         public Sprite icon;
         public Sprite banner;
         public Sprite pause;
@@ -34,6 +37,7 @@ namespace CustomCharacterLoader.CharacterManager
         private class CharacterJsonTemplate
         {
             public string asset_bundle { get; set; }
+            public string banana_bundle { get; set; } = "";
             public string base_monkey { get; set; } = "jet";
             public string monkey_acb { get; set; } = "";
             public string banana_acb { get; set; } = "";
@@ -73,6 +77,18 @@ namespace CustomCharacterLoader.CharacterManager
             catch (Exception ex)
             {
                 Main.Output("Unable to load file: " + Path.Combine(dir, this.assetName));
+            }
+
+            // Bestow Bananas
+            if (template.banana_bundle != "")
+            {
+                Main.Output("Loading " + this.charaName + " Custom bananas: " + this.banana_bundle);
+                this.banana_bundle = AssetBundle.LoadFromFile(Path.Combine(dir, template.banana_bundle));
+                if (this.banana_bundle == null)
+                {
+                    Main.Output("Cant find Banana bundle:" + dir + this.assetName);
+                }
+
             }
 
             // Open sound files
@@ -131,7 +147,7 @@ namespace CustomCharacterLoader.CharacterManager
             this.itemData.m_DescriptionText = clone.m_DescriptionText;
             this.itemData.m_IsHideText = clone.m_IsHideText;
 
-            if(!String.IsNullOrEmpty(this.announcer_acb))
+            if(this.announcer_acb != "")
             {
                 IntPtr cueIdPtr = IL2CPP.GetIl2CppNestedType(IL2CPP.GetIl2CppClass("Assembly-CSharp.dll", "Flash2", "sound_id"), "cue");
                 Il2CppSystem.Type cueIdType = UnhollowerRuntimeLib.Il2CppType.TypeFromPointer(cueIdPtr);
@@ -142,18 +158,14 @@ namespace CustomCharacterLoader.CharacterManager
 
                 Il2CppSystem.Reflection.MethodInfo cueValToNameGetter = erhCue.GetProperty("valueToNameCollection").GetGetMethod();
                 Il2CppSystem.Collections.Generic.Dictionary<sound_id.cue, string> cueValToName = cueValToNameGetter.Invoke(null, new Il2CppReferenceArray<Il2CppSystem.Object>(0)).Cast<Il2CppSystem.Collections.Generic.Dictionary<sound_id.cue, string>>();
-                cueValToName.Add((sound_id.cue)this.cue_id, this.cue_id.ToString());
+                cueValToName.Add((sound_id.cue)this.aCue, this.aCue.ToString());
 
                 Il2CppSystem.Reflection.MethodInfo cueNameToValGetter = erhCue.GetProperty("nameToValueCollection").GetGetMethod();
                 Il2CppSystem.Collections.Generic.Dictionary<string, sound_id.cue> cueNameToVal = cueNameToValGetter.Invoke(null, new Il2CppReferenceArray<Il2CppSystem.Object>(0)).Cast<Il2CppSystem.Collections.Generic.Dictionary<string, sound_id.cue>>();
-                cueNameToVal.Add(this.cue_id.ToString(), (sound_id.cue)this.cue_id);
+                cueNameToVal.Add(this.aCue.ToString(), (sound_id.cue)this.aCue);    
+            }
 
-                this.itemData.m_NarrationCueID = this.cue_id.ToString();
-            }
-            else
-            {
-                this.itemData.m_NarrationCueID = clone.m_NarrationCueID;
-            }
+            this.itemData.m_NarrationCueID = this.aCue.ToString();
             this.itemData.m_PointShopID = "Invalid";
             this.itemData.m_SupplementaryText = clone.m_SupplementaryText;
             this.itemData.m_Text = clone.m_Text;
@@ -193,13 +205,35 @@ namespace CustomCharacterLoader.CharacterManager
                     {
                         material.shader = eyeShader;
                     }
-                    else
-                    {
-                        // do nothing adachi_true :)
-                    }
                 }
             }
             
+            modModel.SetActive(true);
+            return modModel;
+        }
+        
+        public GameObject InitializeBanana(Banana.eKind nanner, MeshRenderer renderer, Shader shader)
+        {
+            GameObject modModel = null;
+            
+            if (nanner == Banana.eKind.Fusa)
+            {
+                var ripeBanana = this.banana_bundle.LoadAsset<GameObject>("bunch");
+                if(ripeBanana != null) modModel = Object.Instantiate(ripeBanana);
+            }
+            else
+            {
+                var ripeBanana = this.banana_bundle.LoadAsset<GameObject>("banana");
+                if(ripeBanana != null) modModel = Object.Instantiate(ripeBanana);
+            }
+
+            MeshRenderer meshRenderer = modModel.GetComponent<MeshRenderer>();
+            if (!meshRenderer.material.name.Contains("balls") && !meshRenderer.material.name.Contains("Custom") && !meshRenderer.material.name.Contains("Alpha")) // if someone asks for yet another exception throw them out a window
+            {
+                meshRenderer.material.shader = shader;
+            }
+            meshRenderer.enabled = false;
+
             modModel.SetActive(true);
             return modModel;
         }
